@@ -12,6 +12,10 @@ public class CookBehaviour : MonoBehaviour
     [SerializeField] private Transform sinkTransform;
     [SerializeField] private Transform binTransform;
     [SerializeField] private Transform kitchenTransform;
+    [SerializeField] private Transform trayTransform;
+    [SerializeField] private Transform studenTransform;
+    [SerializeField] private Transform janitorTransform;
+
 
     private Transform previousDestiny;
 
@@ -57,18 +61,24 @@ public class CookBehaviour : MonoBehaviour
         //States
         State idleState = main_fsm.CreateEntryState("Idle");
         State wanderingState = main_fsm.CreateSubStateMachine("Wandering", wandering_fsm);
-        State chairState = main_fsm.CreateState("Chair");
+        State trayState = main_fsm.CreateState("Tray");
         State studentState = main_fsm.CreateState("Student");
         State janitorState = main_fsm.CreateState("Janitor");
 
         //Create perceptions
         Perception isWandering = main_fsm.CreatePerception<PushPerception>();
-        Perception isWithChair = main_fsm.CreatePerception<PushPerception>();
+        Perception isWithTray = main_fsm.CreatePerception<PushPerception>();
         Perception isWithStudent = main_fsm.CreatePerception<PushPerception>();
         Perception isWithJanitor = main_fsm.CreatePerception<PushPerception>();
 
         //Create the transitions
         Transition idle_to_wandering = main_fsm.CreateTransition("Idle_to_wandering", idleState, isWandering, wanderingState);
+        Transition wandering_to_tray = main_fsm.CreateTransition("Wandering_to_tray", wanderingState, isWithTray, trayState);
+        Transition wandering_to_student = main_fsm.CreateTransition("Wandering_to_student", wanderingState, isWithStudent, studentState);
+        Transition wandering_to_janitor = main_fsm.CreateTransition("Wandering_to_janitor", wanderingState, isWithJanitor, janitorState);
+        Transition tray_to_wandering = main_fsm.CreateTransition("Tray_to_wandering", trayState, isWandering, wanderingState);
+        Transition student_to_wandering = main_fsm.CreateTransition("Student_to_wandering", studentState, isWandering, wanderingState);
+        Transition janitor_to_wandering = main_fsm.CreateTransition("Janitor_to_wandering", janitorState, isWandering, wanderingState);
 
 
         //Call the walk perception
@@ -105,7 +115,12 @@ public class CookBehaviour : MonoBehaviour
     {
         Transform destinySelected = SelectNewDestiny();
         previousDestiny = destinySelected;
-        agent.destination = destinySelected.position;
+        Move(destinySelected);
+    }
+
+    public void Move(Transform destiny)
+    {
+        agent.destination = destiny.position;
     }
 
     private void SinkEvent()
@@ -121,6 +136,21 @@ public class CookBehaviour : MonoBehaviour
     private void KitchenEvent()
     {
         StartCoroutine(StartTimer());
+    }
+
+    private void ChairEvent()
+    {
+
+    }
+
+    private void StudentEvent()
+    {
+
+    }
+
+    private void JanitorEvent()
+    {
+
     }
 
     //Utilities
