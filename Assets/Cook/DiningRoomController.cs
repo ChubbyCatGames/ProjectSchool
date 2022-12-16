@@ -81,17 +81,23 @@ public class DiningRoomController : MonoBehaviour
     //Coroutines
     IEnumerator CleaningTrayRoutine(List<Table> list)
     {
-        foreach(Table t in list)
+        if (list.Count > 0)
         {
+            Table t = list[0];
             //Move
             cookReference.Move(t.transform);
 
             //Wait
-            yield return new WaitUntil(()=>cookReference.HasReachedDestination());
-            print("Llegó");
+            yield return new WaitUntil(() => cookReference.HasReachedDestination());
+
             //Update the State of the table
             t.hasTray = false;
+
+            MustCleanTray();
+
+            yield break;
         }
+        
 
         //Now the cook moves back to put the trays in the self
         cookReference.Move(traysShelf);

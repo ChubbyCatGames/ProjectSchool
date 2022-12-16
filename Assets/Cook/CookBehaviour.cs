@@ -12,7 +12,7 @@ public class CookBehaviour : MonoBehaviour
     [SerializeField] private Transform sinkTransform;
     [SerializeField] private Transform binTransform;
     [SerializeField] private Transform kitchenTransform;
-    [SerializeField] private Transform trayTransform;
+    //[SerializeField] private Transform trayTransform;
     [SerializeField] private Transform studenTransform;
     [SerializeField] private Transform janitorTransform;
 
@@ -66,7 +66,7 @@ public class CookBehaviour : MonoBehaviour
         State wanderingState = main_fsm.CreateSubStateMachine("Wandering", wandering_fsm, walkingState);
         State trayState = main_fsm.CreateState("Tray", TrayEvent);
         State studentState = main_fsm.CreateState("Student");
-        State janitorState = main_fsm.CreateState("Janitor");
+        State janitorState = main_fsm.CreateState("Janitor", JanitorEvent);
 
         //Create perceptions
         Perception isWandering = main_fsm.CreatePerception<PushPerception>();
@@ -91,9 +91,6 @@ public class CookBehaviour : MonoBehaviour
 
     void Update()
     {
-        print("Wandering: " + wandering_fsm.GetCurrentState().Name);
-        print("Main: "+main_fsm.GetCurrentState().Name);
-
         wandering_fsm.Update();
         main_fsm.Update();
 
@@ -121,6 +118,25 @@ public class CookBehaviour : MonoBehaviour
         if (CheckIfTray())
         {
             main_fsm.Fire("Wandering_to_tray");
+        }
+
+        if(main_fsm.GetCurrentState().Name == "Janitor")
+        {
+            if (HasReachedDestination())
+            {
+                main_fsm.Fire("Janitor_to_wandering");
+            }
+        }
+
+        //test
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            JanitorCalls();
+        }
+
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            EndJanitor();
         }
     }
 
@@ -168,10 +184,18 @@ public class CookBehaviour : MonoBehaviour
 
     private void JanitorEvent()
     {
+        StopCoroutine(StartTimer());
 
+        Move(janitorTransform);
     }
 
     //Utilities
+
+    private void JanitorCalls()
+    {
+        main_fsm.Fire("Wandering_to_janitor");
+    }
+
     private bool CheckIfTray()
     {
         return room.CheckIfMustBeCleaned();
@@ -183,6 +207,11 @@ public class CookBehaviour : MonoBehaviour
         MoveToNewDestiny();
     }
 
+    public void EndJanitor()
+    {
+        main_fsm.Fire("Janitor_to_wandering");
+        MoveToNewDestiny();
+    }
 
     public bool HasReachedDestination()
     {
