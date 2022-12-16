@@ -17,11 +17,14 @@ public class CookBehaviour : MonoBehaviour
     [SerializeField] private Transform janitorTransform;
 
 
-    private Transform previousDestiny;
+    public Transform previousDestiny;
 
     //State Machine
     private StateMachineEngine wandering_fsm;
     private StateMachineEngine main_fsm;
+
+    //Room reference
+    [SerializeField] private DiningRoomController room;
 
 
     void Awake()
@@ -35,7 +38,7 @@ public class CookBehaviour : MonoBehaviour
         wandering_fsm = new StateMachineEngine(true);
 
         //Create the states
-        State walkingState = wandering_fsm.CreateEntryState("Walking", MoveToDestiny);
+        State walkingState = wandering_fsm.CreateEntryState("Walking", MoveToNewDestiny);
         State sinkState = wandering_fsm.CreateState("Sink", SinkEvent);
         State binState = wandering_fsm.CreateState("Bin", BinEvent);
         State kitchenState = wandering_fsm.CreateState("Kitchen", KitchenEvent);
@@ -60,8 +63,8 @@ public class CookBehaviour : MonoBehaviour
 
         //States
         State idleState = main_fsm.CreateEntryState("Idle");
-        State wanderingState = main_fsm.CreateSubStateMachine("Wandering", wandering_fsm);
-        State trayState = main_fsm.CreateState("Tray");
+        State wanderingState = main_fsm.CreateSubStateMachine("Wandering", wandering_fsm, walkingState);
+        State trayState = main_fsm.CreateState("Tray", TrayEvent);
         State studentState = main_fsm.CreateState("Student");
         State janitorState = main_fsm.CreateState("Janitor");
 
@@ -88,38 +91,50 @@ public class CookBehaviour : MonoBehaviour
 
     void Update()
     {
+        print("Wandering: " + wandering_fsm.GetCurrentState().Name);
+        print("Main: "+main_fsm.GetCurrentState().Name);
+
         wandering_fsm.Update();
         main_fsm.Update();
 
-        if (HasReachedDestination())
+        if (main_fsm.GetCurrentState().Name == "Wandering")
         {
-            if(previousDestiny == sinkTransform)
+            if (HasReachedDestination())
             {
-                wandering_fsm.Fire("Walk_to_sink");
-            }
-            else if(previousDestiny == binTransform)
-            {
-                wandering_fsm.Fire("Walk_to_bin");
-            }
-            else if(previousDestiny == kitchenTransform)
-            {
-                wandering_fsm.Fire("Walk_to_kitchen");
-            }
+                if (previousDestiny == sinkTransform)
+                {
+                    wandering_fsm.Fire("Walk_to_sink");
+                }
+                else if (previousDestiny == binTransform)
+                {
+                    wandering_fsm.Fire("Walk_to_bin");
+                }
+                else if (previousDestiny == kitchenTransform)
+                {
+                    wandering_fsm.Fire("Walk_to_kitchen");
+                }
 
+                transform.LookAt(new Vector3(previousDestiny.position.x, transform.position.y, previousDestiny.position.z), Vector3.up);
+            }
+        }
+
+        if (CheckIfTray())
+        {
+            main_fsm.Fire("Wandering_to_tray");
         }
     }
 
 
     //Action functions
-    private void MoveToDestiny()
+    private void MoveToNewDestiny()
     {
         Transform destinySelected = SelectNewDestiny();
-        previousDestiny = destinySelected;
         Move(destinySelected);
     }
 
     public void Move(Transform destiny)
     {
+        previousDestiny = destiny;
         agent.destination = destiny.position;
     }
 
@@ -138,9 +153,12 @@ public class CookBehaviour : MonoBehaviour
         StartCoroutine(StartTimer());
     }
 
-    private void ChairEvent()
+    private void TrayEvent()
     {
-
+        StopCoroutine(StartTimer());
+        main_fsm.Fire("Wandering_to_tray");
+        //Call the room controller to start controlling the path of the trays
+        room.MustCleanTray();
     }
 
     private void StudentEvent()
@@ -154,7 +172,19 @@ public class CookBehaviour : MonoBehaviour
     }
 
     //Utilities
-    private bool HasReachedDestination()
+    private bool CheckIfTray()
+    {
+        return room.CheckIfMustBeCleaned();
+    }
+
+    public void EndCleaningTrays()
+    {
+        main_fsm.Fire("Tray_to_wandering");
+        MoveToNewDestiny();
+    }
+
+
+    public bool HasReachedDestination()
     {
         bool destinyReached = false;
 
@@ -168,7 +198,6 @@ public class CookBehaviour : MonoBehaviour
                 }
             }
         }
-
         return destinyReached;
     }
 
@@ -209,11 +238,15 @@ public class CookBehaviour : MonoBehaviour
     }
 
 
-    //Coroutines
 
+
+
+    //Coroutines
     IEnumerator StartTimer() //This timer controls that the cook stays 5 seconds in each of the different labours
     {
         yield return new WaitForSeconds(5f);
+
+        if (main_fsm.GetCurrentState().Name != "Wandering") yield break;
 
         //Call the walk perception after the wait is over
         if(wandering_fsm.GetCurrentState() == wandering_fsm.GetState("Sink"))
