@@ -25,6 +25,15 @@ public class DiningRoomController : MonoBehaviour
 
     [SerializeField] private Transform traysShelf;
 
+    //Food
+    [SerializeField] private Transform watermelons;
+    [SerializeField] private Transform hotDogs;
+    [SerializeField] private Transform cherries;
+    [SerializeField] private Transform burgers;
+    [SerializeField] private Transform cheese;
+    [SerializeField] private Transform bananas;
+
+
     private void Awake()
     {
         //initialize the tables
@@ -48,7 +57,6 @@ public class DiningRoomController : MonoBehaviour
 
 
     //Methods
-
     public bool CheckIfMustBeCleaned()
     {
         bool b = false;
@@ -65,6 +73,11 @@ public class DiningRoomController : MonoBehaviour
         return b;
     }
 
+    public bool CheckIfStudentIsWaiting() //Change eventually
+    {
+        return false;
+    }
+
     public void MustCleanTray()
     {
         //Construct the path of tables to clean
@@ -75,6 +88,45 @@ public class DiningRoomController : MonoBehaviour
         }
 
         StartCoroutine(CleaningTrayRoutine(path));
+    }
+
+    public void MustAttendStudent()
+    {
+        //Do things
+        //Interact with the first studet in the list and ask for the command: AskCommand()
+
+        string command = "Command";
+
+        //Now go for the command; always the tray first and then the food.
+        StartCoroutine(AttendingStudentRoutine(GetFoodTransform(command)));
+    }
+
+    private Transform GetFoodTransform(string word)
+    {
+        switch (word)
+        {
+            case "watermelon":
+                return watermelons;
+                break;
+            case "hotDog":
+                return hotDogs;
+                break;
+            case "cherry":
+                return cherries;
+                break;
+            case "burger":
+                return burgers;
+                break;
+            case "cheese":
+                return cheese;
+                break;
+            case "banana":
+                return bananas;
+                break;
+            default:
+                return watermelons;
+                break;
+        }
     }
 
 
@@ -105,5 +157,16 @@ public class DiningRoomController : MonoBehaviour
         yield return new WaitUntil(() => cookReference.HasReachedDestination());
 
         cookReference.EndCleaningTrays();
+    }
+
+    IEnumerator AttendingStudentRoutine(Transform foodTransform)
+    {
+        cookReference.Move(traysShelf);
+
+        yield return new WaitUntil(() => cookReference.HasReachedDestination());
+
+        cookReference.Move(foodTransform);
+
+        //If there are still students,  attend the next again: MustAttend()
     }
 }

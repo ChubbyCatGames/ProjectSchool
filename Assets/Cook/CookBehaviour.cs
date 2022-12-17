@@ -8,14 +8,16 @@ public class CookBehaviour : MonoBehaviour
 
     private NavMeshAgent agent;
 
+    //Signs controller
+    [SerializeField] private SignsController sc;
+
     //Target Positions
     [SerializeField] private Transform sinkTransform;
     [SerializeField] private Transform binTransform;
     [SerializeField] private Transform kitchenTransform;
     //[SerializeField] private Transform trayTransform;
-    [SerializeField] private Transform studenTransform;
+    [SerializeField] private Transform studentTransform;
     [SerializeField] private Transform janitorTransform;
-
 
     public Transform previousDestiny;
 
@@ -25,6 +27,9 @@ public class CookBehaviour : MonoBehaviour
 
     //Room reference
     [SerializeField] private DiningRoomController room;
+
+    //Control variables
+    private bool isAttendingStudent = false;
 
 
     void Awake()
@@ -65,7 +70,7 @@ public class CookBehaviour : MonoBehaviour
         State idleState = main_fsm.CreateEntryState("Idle");
         State wanderingState = main_fsm.CreateSubStateMachine("Wandering", wandering_fsm, walkingState);
         State trayState = main_fsm.CreateState("Tray", TrayEvent);
-        State studentState = main_fsm.CreateState("Student");
+        State studentState = main_fsm.CreateState("Student", StudentEvent);
         State janitorState = main_fsm.CreateState("Janitor", JanitorEvent);
 
         //Create perceptions
@@ -101,14 +106,20 @@ public class CookBehaviour : MonoBehaviour
                 if (previousDestiny == sinkTransform)
                 {
                     wandering_fsm.Fire("Walk_to_sink");
+
+                    sc.ShowNewSign(0);
                 }
                 else if (previousDestiny == binTransform)
                 {
                     wandering_fsm.Fire("Walk_to_bin");
+
+                    sc.ShowNewSign(1);
                 }
                 else if (previousDestiny == kitchenTransform)
                 {
                     wandering_fsm.Fire("Walk_to_kitchen");
+
+                    sc.ShowNewSign(2);
                 }
 
                 transform.LookAt(new Vector3(previousDestiny.position.x, transform.position.y, previousDestiny.position.z), Vector3.up);
@@ -120,11 +131,25 @@ public class CookBehaviour : MonoBehaviour
             main_fsm.Fire("Wandering_to_tray");
         }
 
+        if (CheckIfStudent())
+        {
+            main_fsm.Fire("Wandering_to_student");
+        }
+
         if(main_fsm.GetCurrentState().Name == "Janitor")
         {
             if (HasReachedDestination())
             {
-                main_fsm.Fire("Janitor_to_wandering");
+                EndJanitor();
+            }
+        }
+
+        if(main_fsm.GetCurrentState().Name == "Student" && !isAttendingStudent)
+        {
+            if (HasReachedDestination())
+            {
+                isAttendingStudent = true;
+                room.MustAttendStudent();
             }
         }
 
@@ -173,13 +198,20 @@ public class CookBehaviour : MonoBehaviour
     {
         StopCoroutine(StartTimer());
         main_fsm.Fire("Wandering_to_tray");
+
+        sc.RemoveSign();
+
         //Call the room controller to start controlling the path of the trays
         room.MustCleanTray();
     }
 
     private void StudentEvent()
     {
+        StopCoroutine(StartTimer());
 
+        Move(studentTransform);
+
+        sc.RemoveSign();
     }
 
     private void JanitorEvent()
@@ -187,6 +219,8 @@ public class CookBehaviour : MonoBehaviour
         StopCoroutine(StartTimer());
 
         Move(janitorTransform);
+
+        sc.RemoveSign();
     }
 
     //Utilities
@@ -199,6 +233,11 @@ public class CookBehaviour : MonoBehaviour
     private bool CheckIfTray()
     {
         return room.CheckIfMustBeCleaned();
+    }
+
+    private bool CheckIfStudent()
+    {
+        return room.CheckIfStudentIsWaiting();
     }
 
     public void EndCleaningTrays()
@@ -290,5 +329,7 @@ public class CookBehaviour : MonoBehaviour
         {
             wandering_fsm.Fire("Kitchen_to_walk");
         }
+
+        sc.RemoveSign();
     }
 }
