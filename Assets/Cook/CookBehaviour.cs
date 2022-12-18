@@ -16,7 +16,7 @@ public class CookBehaviour : MonoBehaviour
     [SerializeField] private Transform binTransform;
     [SerializeField] private Transform kitchenTransform;
     //[SerializeField] private Transform trayTransform;
-    [SerializeField] private Transform studentTransform;
+    [SerializeField] public Transform studentTransform;
     [SerializeField] private Transform janitorTransform;
 
     public Transform previousDestiny;
@@ -249,6 +249,12 @@ public class CookBehaviour : MonoBehaviour
     public void EndJanitor()
     {
         main_fsm.Fire("Janitor_to_wandering");
+        MoveToNewDestiny();
+    }
+
+    public void EndStudent()
+    {
+        main_fsm.Fire("Student_to_wandering");
         MoveToNewDestiny();
     }
 

@@ -6,7 +6,7 @@ using UnityEngine.AI;
 public class ghostBehaviour : MonoBehaviour
 {
     //Navigation Agent
-    private NavMeshAgent agent;
+    public NavMeshAgent agent;
 
     //Behaviour Tree
     BehaviourTreeEngine ghostBT;

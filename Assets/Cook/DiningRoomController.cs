@@ -4,22 +4,10 @@ using UnityEngine;
 
 public class DiningRoomController : MonoBehaviour
 {
-    class Table
-    {
-        public int id;
-        public Transform transform;
-        public bool hasTray;
+    [SerializeField] private List<Table> tablesList = new List<Table>();
 
-        public Table(int id, Transform transform, bool hasTray)
-        {
-            this.id = id;
-            this.transform = transform;
-            this.hasTray = hasTray;
-        }
-    }
-
-    [SerializeField] private List<GameObject> initialTables = new List<GameObject>();
-    private List<Table> listTables = new List<Table>();
+    [SerializeField] private List<ghostBehaviour> ghostsList = new List<ghostBehaviour>();
+    [SerializeField] private Transform queue;
 
     [SerializeField] private CookBehaviour cookReference;
 
@@ -34,26 +22,18 @@ public class DiningRoomController : MonoBehaviour
     [SerializeField] private Transform bananas;
 
 
-    private void Awake()
-    {
-        //initialize the tables
-        int id = 0;
-        foreach(GameObject o in initialTables)
-        {
-            listTables.Add(new Table(id, o.transform, false));
-            id++;
-        }
-    }
-
     private void Update()
     {
         //For testing purposes:
         if (Input.GetKeyDown(KeyCode.A))
         {
-            listTables[Random.Range(0, listTables.Count)].hasTray = true;
+            tablesList[Random.Range(0, tablesList.Count)].hasTray = true;
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            ghostsList.Add(new ghostBehaviour());
         }
     }
-
 
 
     //Methods
@@ -61,7 +41,7 @@ public class DiningRoomController : MonoBehaviour
     {
         bool b = false;
 
-        foreach (Table t in listTables)
+        foreach (Table t in tablesList)
         {
             if (t.hasTray)
             {
@@ -75,14 +55,14 @@ public class DiningRoomController : MonoBehaviour
 
     public bool CheckIfStudentIsWaiting() //Change eventually
     {
-        return false;
+        return ghostsList.Count > 0;
     }
 
     public void MustCleanTray()
     {
         //Construct the path of tables to clean
         List<Table> path = new List<Table>();
-        foreach(Table t in listTables)
+        foreach(Table t in tablesList)
         {
             if (t.hasTray) path.Add(t);
         }
@@ -95,7 +75,7 @@ public class DiningRoomController : MonoBehaviour
         //Do things
         //Interact with the first studet in the list and ask for the command: AskCommand()
 
-        string command = "Command";
+        string command = "cheese";
 
         //Now go for the command; always the tray first and then the food.
         StartCoroutine(AttendingStudentRoutine(GetFoodTransform(command)));
@@ -126,6 +106,15 @@ public class DiningRoomController : MonoBehaviour
             default:
                 return watermelons;
                 break;
+        }
+    }
+
+    private void DisplayQueue()//Call when necesary to show or update the queue of ghosts
+    {
+        float distance = 1f;
+        for (int i=0; i<ghostsList.Count; i++)
+        {
+            ghostsList[i].agent.destination = new Vector3(queue.position.x, ghostsList[i].transform.position.y, queue.position.z - i * distance);
         }
     }
 
@@ -161,12 +150,23 @@ public class DiningRoomController : MonoBehaviour
 
     IEnumerator AttendingStudentRoutine(Transform foodTransform)
     {
+        yield return new WaitForSeconds(2f);
+
         cookReference.Move(traysShelf);
 
         yield return new WaitUntil(() => cookReference.HasReachedDestination());
 
         cookReference.Move(foodTransform);
 
-        //If there are still students,  attend the next again: MustAttend()
+        yield return new WaitUntil(() => cookReference.HasReachedDestination());
+
+        cookReference.Move(cookReference.studentTransform);
+
+        yield return new WaitUntil(() => cookReference.HasReachedDestination());
+        yield return new WaitForSeconds(1f);
+
+        ghostsList.RemoveAt(0);
+
+        cookReference.EndStudent();
     }
 }
