@@ -28464,6 +28464,7 @@ MonoBehaviour:
   speed: 5
   maxStep: 1
   bellDestination: {x: 0, y: 0, z: 0}
+  school: {fileID: 536208440}
   timePee: 0
   needPee: 0
   timeEat: 0

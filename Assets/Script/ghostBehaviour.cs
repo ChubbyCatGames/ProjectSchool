@@ -33,7 +33,7 @@ public class ghostBehaviour : MonoBehaviour
     //TimerDecoratorNode timerNode;
 
     //Behaviour Tree MEthods
-    SchoolScript school;
+     public SchoolScript school;
     BoxCollider aula;
     //Utility System
     UtilitySystemEngine us;
