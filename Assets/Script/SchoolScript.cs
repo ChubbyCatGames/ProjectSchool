@@ -25,6 +25,9 @@ public class SchoolScript : MonoBehaviour
     [SerializeField] Transform initialPosTeacher;
     [SerializeField] Transform initialPosJanitor;
     [SerializeField] Transform initialPosCook;
+
+    [Header("Classes")]
+    [SerializeField]public List<BoxCollider> classList = new List<BoxCollider>();
     
     // Start is called before the first frame update
     void Start()
@@ -71,8 +74,19 @@ public class SchoolScript : MonoBehaviour
         while(true) {
             yield return new WaitForSeconds(Random.Range(20f,40f));
             Debug.Log("A CLASE");
-
+            
+            //IF BELLSTATUS DICE QUE TOCA CLASE
+            BoxCollider selectedClass = SelectRandomClass();
             //Foreach pj => lanzar una percepcion de que ha sonado la campana
+
+            //IF BELLSTATUS DICE QUE NO TOCA CLASE
+            //A WANDEREAR JEFES
         }
+    }
+
+    public BoxCollider SelectRandomClass()
+    {
+        int randomClass = Random.Range(0, classList.Count);
+        return classList[randomClass];
     }
 }
