@@ -52,11 +52,10 @@ public class ghostBehaviour : MonoBehaviour
     //BT
     private void CreateBehaviourTree()
     {
-        ghostBT = new BehaviourTreeEngine();
+        
 
         root = ghostBT.CreateSequenceNode("Root selector", false);
         selectorGoClass = ghostBT.CreateSelectorNode("Go to class");
-        wander = ghostBT.CreateSubBehaviour("Wander", us);
         sequenceClass = ghostBT.CreateSequenceNode("Actions in class", false);
         goToClass = ghostBT.CreateLeafNode("Walk to class", WalkToClass, ArriveToClass);
         selectClassAction = ghostBT.CreateSelectorNode("Select class action");
@@ -130,17 +129,21 @@ public class ghostBehaviour : MonoBehaviour
         us.CreateUtilityAction("Eat", OrderingFoodAction, curveEating);
         us.CreateUtilityAction("Ghosting", GhostingAction, curveGhosting);
 
+        wander = ghostBT.CreateSubBehaviour("Wander", us);
+
     }
 
     private void Awake()
     {
+        ghostBT = new BehaviourTreeEngine();
         agent = GetComponent<NavMeshAgent>();
     }
     // Start is called before the first frame update
     void Start()
     {
-        CreateBehaviourTree();
         CreateUtilitySystem();
+        CreateBehaviourTree();
+        
     }
 
     // Update is called once per frame
