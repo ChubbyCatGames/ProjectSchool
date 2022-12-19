@@ -67,7 +67,7 @@ public class TestJanitor : MonoBehaviour
 
         //fsm.CreateTransition("stainAppears", walk, stainAppears, clean);
         //fsm.CreateTransition("staincCleaned", clean, staincCleaned, walk);
-        Debug.Log(fsm.GetCurrentState().Name);
+        //Debug.Log(fsm.GetCurrentState().Name);
     }
 
     // Update is called once per frame
@@ -102,7 +102,7 @@ public class TestJanitor : MonoBehaviour
             //Debug.Log(fsm.GetCurrentState().Name);
         }
 
-        Debug.Log(fsm.GetCurrentState().Name);
+        //Debug.Log(fsm.GetCurrentState().Name);
         //Debug.Log(arriveToDestination.Check2());
 
         if (Vector3.Distance(transform.position, targets[0].transform.position) < 0.8f && fsm.GetCurrentState().Name == "walk")
@@ -112,13 +112,13 @@ public class TestJanitor : MonoBehaviour
             fsm.Fire("second");
 
 
-            Debug.Log("HACIA segundo destino");
+            //Debug.Log("HACIA segundo destino");
         }
 
-        Debug.Log(Vector3.Distance(transform.position, targets[1].transform.position) < 2.0f);
+        //Debug.Log(Vector3.Distance(transform.position, targets[1].transform.position) < 2.0f);
         if (fsm.GetCurrentState().Name == "walkToPA" && Vector3.Distance(transform.position, targets[1].transform.position) < 2.0f)
         {
-            Debug.Log("EN segundo destino");
+            //Debug.Log("EN segundo destino");
             if (endFlirt == false)
             {
                 fsm.Fire("flirt");
@@ -127,7 +127,7 @@ public class TestJanitor : MonoBehaviour
 
         if (fsm.GetCurrentState().Name == "flirt" && Vector3.Distance(transform.position, targets[1].transform.position) < 2.0f)
         {
-            Debug.Log("xd");
+            //Debug.Log("xd");
             if (endFlirt == true)
             {
                 fsm.Fire("third");
@@ -197,12 +197,12 @@ public class TestJanitor : MonoBehaviour
 
     void CleanAction()
     {
-        Debug.Log("limpiarrr");
+        //Debug.Log("limpiarrr");
     }
 
     void FlirtAction()
     {
-        Debug.Log("ESPERANDO");
+        //Debug.Log("ESPERANDO");
         
         flagForCook = true;
        // while (Vector3.Distance(transform.position, rcook.transform.position)>1.0f) {}
@@ -214,11 +214,11 @@ public class TestJanitor : MonoBehaviour
 
     IEnumerator Flirt()
     {
-        Debug.Log("FLIRTEANDO");
+        //Debug.Log("FLIRTEANDO");
         
         scJan.ShowNewSign(0);
         yield return new WaitForSeconds(3.0f);
-        Debug.Log("FIN");
+        //Debug.Log("FIN");
         scJan.RemoveSign();
         flagForCook = false;
         endFlirt = true;
