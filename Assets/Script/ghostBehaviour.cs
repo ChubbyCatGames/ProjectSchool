@@ -7,7 +7,12 @@ public class ghostBehaviour : MonoBehaviour
 {
     //Navigation Agent
     public NavMeshAgent agent;
-  
+
+    //MovimientodDelPersonaje
+    public Vector3 destination;
+    public float speed = 5.0f;
+    public float maxStep = 1.0f;
+    public Vector3 bellDestination;
 
     //Behaviour Tree
     BehaviourTreeEngine ghostBT;
@@ -28,8 +33,6 @@ public class ghostBehaviour : MonoBehaviour
     public float timePee;
     public float needPee;
 
-    public float needClass;
-
     public float timeEat;
     public float needEat;
     public const float thresholdEat = 75;
@@ -43,19 +46,17 @@ public class ghostBehaviour : MonoBehaviour
     float minNeed = 0;
     float maxNeed = 1;
 
-    Perception bellPerception;
-
     //Signs controller
     [SerializeField] private SignsController sc;
 
     //BT
     private void CreateBehaviourTree()
     {
-        ghostBT = new BehaviourTreeEngine(false);
+        ghostBT = new BehaviourTreeEngine();
 
         root = ghostBT.CreateSequenceNode("Root selector", false);
         selectorGoClass = ghostBT.CreateSelectorNode("Go to class");
-        
+        wander = ghostBT.CreateSubBehaviour("Wander", us);
         sequenceClass = ghostBT.CreateSequenceNode("Actions in class", false);
         goToClass = ghostBT.CreateLeafNode("Walk to class", WalkToClass, ArriveToClass);
         selectClassAction = ghostBT.CreateSelectorNode("Select class action");
@@ -68,7 +69,7 @@ public class ghostBehaviour : MonoBehaviour
         //Children
         root.AddChild(selectorGoClass);
 
-        //selectorGoClass.AddChild(wander);
+        selectorGoClass.AddChild(wander);
         selectorGoClass.AddChild(sequenceClass);
 
         sequenceClass.AddChild(goToClass);
@@ -88,8 +89,9 @@ public class ghostBehaviour : MonoBehaviour
 
     //Go to class
     public virtual void WalkToClass() {
-        
+       
     }
+   
 
     public ReturnValues ArriveToClass() { return ReturnValues.Succeed; } 
     
@@ -120,21 +122,14 @@ public class ghostBehaviour : MonoBehaviour
         Factor factorEat = new LeafVariable(()=>needEat, maxNeed, minNeed);//sigmoide
         Factor factorGhosting = new LeafVariable(()=>needGhosting, maxNeed, minNeed);//umbral/threshold
 
-        Factor bell = new LeafVariable(()=>needClass, maxNeed, minNeed);
-
         Factor curvePee = new LinearCurve(factorPee, 0.01f);
         Factor curveGhosting = new Sigmoide(factorGhosting, a, b);
         Factor curveEating = new Threshold(factorEat, thresholdEat);
-   
-        bellPerception = us.CreatePerception<PushPerception>();
 
         us.CreateUtilityAction("Pee", UrinatingAction, curvePee);
         us.CreateUtilityAction("Eat", OrderingFoodAction, curveEating);
         us.CreateUtilityAction("Ghosting", GhostingAction, curveGhosting);
 
-        us.CreateUtilityAction("Exit", bell, ReturnValues.Succeed, ghostBT);
-
-        wander = ghostBT.CreateSubBehaviour("Wander", us);
     }
 
     private void Awake()
@@ -153,13 +148,21 @@ public class ghostBehaviour : MonoBehaviour
     {
         ghostBT.Update();
         us.Update();
+
+        
     }
 
 
     //ACCIONES DEL SISTEMA DE UTILIDAD
     void Wandering()
     {
+        Vector3 destination = new Vector3(Random.Range(-10.0f, 10.0f), 0.0f, Random.Range(-10.0f, 10.0f));
 
+        // Calculate the direction to the destination
+        Vector3 direction = (destination - transform.position).normalized;
+
+        // Move the character towards the destination
+        transform.position = transform.position + direction * Mathf.Min(speed * Time.deltaTime, maxStep);
     }
 
     void UrinatingAction()
