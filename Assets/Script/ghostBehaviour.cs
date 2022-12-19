@@ -5,6 +5,7 @@ using UnityEngine.AI;
 
 public class ghostBehaviour : MonoBehaviour
 {
+    public List<Transform> targets;
     public BellStatus bellState { get; set; }
     public bool bellRinging=false;
     public bool sitting;
@@ -218,16 +219,16 @@ public class ghostBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if (bellState== BellStatus.Active)
-        //{
-        //    bellRinging = true;
-        //}
-        //else if (bellState == BellStatus.Unactive)
-        //{
-        //    bellRinging = false;
-        //}
+        if (bellState== BellStatus.Active)
+        {
+            bellRinging = true;
+        }
+        else if (bellState == BellStatus.Unactive)
+        {
+            bellRinging = false;
+        }
 
-        if (!activeNeed)
+        if (!bellRinging)
         {
             Wandering();
         }
@@ -245,21 +246,34 @@ public class ghostBehaviour : MonoBehaviour
     //ACCIONES DEL SISTEMA DE UTILIDAD
     void Wandering()
     {
-       
-    
-    // Check if the character has reached its destination
-        if (agent.remainingDistance<agent.stoppingDistance)
-        {
-            // Generate a new destination for the character
-            GenerateMovement();
-         }
 
-     // Check if the character is still on the NavMesh
-    if (!agent.isOnNavMesh)
-       {
-    // Move the character back onto the NavMesh
-        agent.Warp(transform.position);
-       }
+
+        // Check if the character has reached its destination
+        if (agent.remainingDistance < agent.stoppingDistance)
+        {
+            // Generate a random position within the limits of the stage
+            Vector3 randomPosition = new Vector3(Random.Range(-10, 10), 0, Random.Range(-10, 10));
+
+
+
+            // Find the closest point on the NavMesh to the random position
+            NavMeshHit hit;
+            NavMesh.SamplePosition(randomPosition, out hit, 1.0f, NavMesh.AllAreas);
+
+
+
+            // Set the character's destination to the closest point on the NavMesh
+            agent.SetDestination(hit.position);
+        }
+
+
+
+        // Check if the character is still on the NavMesh
+        if (!agent.isOnNavMesh)
+        {
+            // Move the character back onto the NavMesh
+            agent.Warp(transform.position);
+        }
 
         Debug.Log("Wandereando");
     }

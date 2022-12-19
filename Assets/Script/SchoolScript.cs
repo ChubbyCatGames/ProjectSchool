@@ -6,6 +6,7 @@ public class SchoolScript : MonoBehaviour
 {
     [SerializeField] int numStudent = 30;
     [SerializeField] int numTeacher= 10;
+    public bool isRinging = false;
 
     [Header("Prefabs")]
     [SerializeField] GameObject prefabStudent;
@@ -74,7 +75,7 @@ public class SchoolScript : MonoBehaviour
         while(true) {
             yield return new WaitForSeconds(Random.Range(20f,40f));
             Debug.Log("A CLASE");
-            
+            isRinging = true;
             //IF BELLSTATUS DICE QUE TOCA CLASE
             BoxCollider selectedClass = SelectRandomClass();
             //Foreach pj => lanzar una percepcion de que ha sonado la campana

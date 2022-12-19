@@ -10,6 +10,7 @@ public class SetBellStatus : MonoBehaviour
     private GameObject ghost;
     private ghostBehaviour ghostBT;
     private Slider bellStatusSlider;
+    private SchoolScript school;
     // Start is called before the first frame update
     void Start()
     {
@@ -18,23 +19,13 @@ public class SetBellStatus : MonoBehaviour
 
     public void SetBellState()
     {
-        if (ghost == null)
+        if (school.isRinging)
         {
-            ghost = GameObject.FindGameObjectWithTag("Ghost");
-            ghostBT = ghost.GetComponent<ghostBehaviour>();
+            ghostBT.bellState = BellStatus.Active;
         }
+        else if(!school.isRinging) { ghostBT.bellState = BellStatus.Unactive; }
 
-        switch (bellStatusSlider.value)
-        {
-            case 0:
-                ghostBT.bellState = BellStatus.Unactive;
-                break;
-
-            case 1:
-                ghostBT.bellState = BellStatus.Active;
-                
-                break;
-        }
+       
     }
 
   
