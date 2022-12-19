@@ -7,6 +7,7 @@ public class ghostBehaviour : MonoBehaviour
 {
     public BellStatus bellState { get; set; }
     public bool bellRinging;
+    public bool sitting;
     //Navigation Agent
     public NavMeshAgent agent;
 
@@ -30,6 +31,9 @@ public class ghostBehaviour : MonoBehaviour
     LeafNode joking;
     //TimerDecoratorNode timerNode;
 
+    //Behaviour Tree MEthods
+    SchoolScript school;
+    BoxCollider aula;
     //Utility System
     UtilitySystemEngine us;
     public float timePee;
@@ -93,26 +97,34 @@ public class ghostBehaviour : MonoBehaviour
     public virtual void WalkToClass() {
         if (bellState == BellStatus.Active)
         {
-            agent.destination = new Vector3()
-            bellRinging = true;
+            school.SelectRandomClass();
+            //desplazamiento del agente hasta la silla y sentarse
+            //if intercatua con la silla)
+            sitting = true;
 
 
         }
         else
         {
-            bellRinging = false;
+            sitting = false;
         }
        
     }
    
 
     public ReturnValues ArriveToClass() {
-        if (bellRinging = true)
+        if (sitting)
         {
             return ReturnValues.Succeed;
-        } 
-        else return{
+        }
+        else if (!bellRinging)
+        {
             return ReturnValues.Failed;
+        }
+        else
+        {
+
+            return ReturnValues.Running;
         }
     } 
     
