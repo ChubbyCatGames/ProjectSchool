@@ -252,8 +252,8 @@ public class ghostBehaviour : MonoBehaviour
         if (agent.remainingDistance < agent.stoppingDistance)
         {
             // Generate a random position within the limits of the stage
-            Vector3 randomPosition = new Vector3(Random.Range(-10, 10), 0, Random.Range(-10, 10));
-
+            //Vector3 randomPosition = new Vector3(Random.Range(-10, 10), 0, Random.Range(-10, 10));
+            Vector3 randomPosition = SelectRandomPosition();
 
 
             // Find the closest point on the NavMesh to the random position
@@ -276,6 +276,14 @@ public class ghostBehaviour : MonoBehaviour
         }
 
         Debug.Log("Wandereando");
+    }
+
+    private Vector3 SelectRandomPosition()
+    {
+        int random = Random.Range(0, targets.Count-1);
+        Vector3 position = targets[random].position;
+
+        return position;
     }
 
     void GenerateMovement()
