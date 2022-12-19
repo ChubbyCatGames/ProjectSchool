@@ -86,7 +86,7 @@ public class SchoolScript : MonoBehaviour
 
     public BoxCollider SelectRandomClass()
     {
-        int randomClass = Random.Range(0, classList.Count);
+        int randomClass = Random.Range(0, classList.Count-1);
         return classList[randomClass];
     }
 }

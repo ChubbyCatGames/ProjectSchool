@@ -6,15 +6,15 @@ using UnityEngine.AI;
 public class ghostBehaviour : MonoBehaviour
 {
     public BellStatus bellState { get; set; }
-    public bool bellRinging;
+    public bool bellRinging=false;
     public bool sitting;
     //Navigation Agent
     public NavMeshAgent agent;
 
     //MovimientodDelPersonaje
     public Vector3 destination;
-    public float speed = 5.0f;
-    public float maxStep = 1.0f;
+    public float speed = 100000f;
+    public float maxStep = 100000f;
     public Vector3 bellDestination;
 
     //Behaviour Tree
@@ -42,6 +42,8 @@ public class ghostBehaviour : MonoBehaviour
     public float timeEat;
     public float needEat;
     public const float thresholdEat = 75;
+
+    public bool activeNeed;
 
     //scaring for alumni, teachers room for teachers
     public float timeGhosting;
@@ -72,13 +74,16 @@ public class ghostBehaviour : MonoBehaviour
         //timerNode = ghostBT.CreateTimerNode("Timer", isturnAround, 5);
 
         //Children
-        root.AddChild(selectorGoClass);
-
-        selectorGoClass.AddChild(sequenceClass);
-        selectorGoClass.AddChild(wander);
         
 
-        sequenceClass.AddChild(goToClass);
+        
+        root.AddChild(selectorGoClass);
+
+        //root.AddChild(sequenceClass);
+        selectorGoClass.AddChild(goToClass);
+        selectorGoClass.AddChild(sequenceClass);
+        selectorGoClass.AddChild(wander);
+
         sequenceClass.AddChild(selectClassAction);
 
         selectClassAction.AddChild(learn);
@@ -95,14 +100,16 @@ public class ghostBehaviour : MonoBehaviour
 
     //Go to class
     public virtual void WalkToClass() {
-        if (bellState == BellStatus.Active)
+        
+        if (bellRinging==true)
         {
-            school.SelectRandomClass();
-            //desplazamiento del agente hasta la silla y sentarse
-            //if intercatua con la silla)
-            sitting = true;
-
-
+            aula=school.SelectRandomClass();
+            agent.destination = new Vector3(aula.transform.position.x, aula.transform.position.y, aula.transform.position.z);
+            
+            if (HasReachedDestination())
+            {
+                sitting = true;
+            }
         }
         else
         {
@@ -113,7 +120,8 @@ public class ghostBehaviour : MonoBehaviour
    
 
     public ReturnValues ArriveToClass() {
-        if (sitting)
+        
+        if (bellRinging && sitting)
         {
             return ReturnValues.Succeed;
         }
@@ -121,13 +129,33 @@ public class ghostBehaviour : MonoBehaviour
         {
             return ReturnValues.Failed;
         }
-        else
+        else if (bellRinging && !sitting)
         {
 
             return ReturnValues.Running;
         }
-    } 
-    
+        else
+        {
+            return ReturnValues.Running;
+        }
+    }
+    public bool HasReachedDestination()
+    {
+        bool destinyReached = false;
+
+        if (!agent.pathPending)
+        {
+            if (agent.remainingDistance <= agent.stoppingDistance)
+            {
+                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                {
+                    destinyReached = true;
+                }
+            }
+        }
+        return destinyReached;
+    }
+
     //Learning
     public virtual void learnAction() { }
 
@@ -146,12 +174,13 @@ public class ghostBehaviour : MonoBehaviour
     private void CreateUtilitySystem()
     {
         us = new UtilitySystemEngine(true);
+        activeNeed = false;
 
         needEat = minNeed;
         needPee = minNeed;
         needGhosting = minNeed;
 
-        Wandering();
+        
     
         Factor factorPee= new LeafVariable(()=>needPee, maxNeed, minNeed);//linear
         Factor factorEat = new LeafVariable(()=>needEat, maxNeed, minNeed);//sigmoide
@@ -173,6 +202,7 @@ public class ghostBehaviour : MonoBehaviour
     {
         ghostBT = new BehaviourTreeEngine();
         agent = GetComponent<NavMeshAgent>();
+        agent.SetDestination(transform.position);
     }
     // Start is called before the first frame update
     void Start()
@@ -188,6 +218,23 @@ public class ghostBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //if (bellState== BellStatus.Active)
+        //{
+        //    bellRinging = true;
+        //}
+        //else if (bellState == BellStatus.Unactive)
+        //{
+        //    bellRinging = false;
+        //}
+
+        if (!activeNeed)
+        {
+            Wandering();
+        }
+
+        
+
+
         ghostBT.Update();
         us.Update();
 
@@ -198,17 +245,38 @@ public class ghostBehaviour : MonoBehaviour
     //ACCIONES DEL SISTEMA DE UTILIDAD
     void Wandering()
     {
-        Vector3 destination = new Vector3(Random.Range(-10.0f, 10.0f), 0.0f, Random.Range(-10.0f, 10.0f));
+       
+    
+    // Check if the character has reached its destination
+        if (agent.remainingDistance<agent.stoppingDistance)
+        {
+            // Generate a new destination for the character
+            GenerateMovement();
+         }
 
-        // Calculate the direction to the destination
-        Vector3 direction = (destination - transform.position).normalized;
+     // Check if the character is still on the NavMesh
+    if (!agent.isOnNavMesh)
+       {
+    // Move the character back onto the NavMesh
+        agent.Warp(transform.position);
+       }
 
-        // Move the character towards the destination
-        transform.position = transform.position + direction * Mathf.Min(speed * Time.deltaTime, maxStep);
+        Debug.Log("Wandereando");
     }
+
+    void GenerateMovement()
+    {
+    // Set a new random destination within the bounds of the NavMesh
+    agent.SetDestination(Random.insideUnitSphere * agent.areaMask);
+    }
+
+
+    
 
     void UrinatingAction()
     {
+        activeNeed = true;
+
 
     }
 
