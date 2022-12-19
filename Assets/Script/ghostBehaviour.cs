@@ -5,6 +5,8 @@ using UnityEngine.AI;
 
 public class ghostBehaviour : MonoBehaviour
 {
+    public BellStatus bellState { get; set; }
+    public bool bellRinging;
     //Navigation Agent
     public NavMeshAgent agent;
 
@@ -68,8 +70,9 @@ public class ghostBehaviour : MonoBehaviour
         //Children
         root.AddChild(selectorGoClass);
 
-        selectorGoClass.AddChild(wander);
         selectorGoClass.AddChild(sequenceClass);
+        selectorGoClass.AddChild(wander);
+        
 
         sequenceClass.AddChild(goToClass);
         sequenceClass.AddChild(selectClassAction);
@@ -88,11 +91,30 @@ public class ghostBehaviour : MonoBehaviour
 
     //Go to class
     public virtual void WalkToClass() {
+        if (bellState == BellStatus.Active)
+        {
+            agent.destination = new Vector3()
+            bellRinging = true;
+
+
+        }
+        else
+        {
+            bellRinging = false;
+        }
        
     }
    
 
-    public ReturnValues ArriveToClass() { return ReturnValues.Succeed; } 
+    public ReturnValues ArriveToClass() {
+        if (bellRinging = true)
+        {
+            return ReturnValues.Succeed;
+        } 
+        else return{
+            return ReturnValues.Failed;
+        }
+    } 
     
     //Learning
     public virtual void learnAction() { }
@@ -116,6 +138,8 @@ public class ghostBehaviour : MonoBehaviour
         needEat = minNeed;
         needPee = minNeed;
         needGhosting = minNeed;
+
+        Wandering();
     
         Factor factorPee= new LeafVariable(()=>needPee, maxNeed, minNeed);//linear
         Factor factorEat = new LeafVariable(()=>needEat, maxNeed, minNeed);//sigmoide
@@ -141,6 +165,9 @@ public class ghostBehaviour : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+
+        bellRinging = false;
+
         CreateUtilitySystem();
         CreateBehaviourTree();
         
