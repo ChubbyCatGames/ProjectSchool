@@ -29,11 +29,13 @@ public class ghostBehaviour : MonoBehaviour
 
     public float timeEat;
     public float needEat;
-    public float thresholdEat = 75;
+    public const float thresholdEat = 75;
 
     //scaring for alumni, teachers room for teachers
     public float timeGhosting;
     public float needGhosting;
+    public const float a = 20;
+    public const float b = 50;
 
     float minNeed = 0;
     float maxNeed = 1;
@@ -112,6 +114,13 @@ public class ghostBehaviour : MonoBehaviour
         Factor factorGhosting = new LeafVariable(()=>needGhosting, maxNeed, minNeed);//umbral/threshold
 
         Factor curvePee = new LinearCurve(factorPee, 0.01f);
+        Factor curveGhosting = new Sigmoide(factorGhosting, a, b);
+        Factor curveEating = new Threshold(factorEat, thresholdEat);
+
+        us.CreateUtilityAction("Pee", UrinatingAction, curvePee);
+        us.CreateUtilityAction("Eat", OrderingFoodAction, curveEating);
+        us.CreateUtilityAction("Ghosting", GhostingAction, curveGhosting);
+
     }
 
     private void Awake()
@@ -154,6 +163,102 @@ public class ghostBehaviour : MonoBehaviour
 
     }
 
-    //ACCIONES DEL BT
+    protected virtual void GhostingAction()
+    {
+
+    }
+
+}
+
+public class Sigmoide : Curve
+{
+    #region variables
+
+    private float m, c;
+
+    #endregion
+
+    #region constructors
+    /// <summary>
+    /// Creates a linear function factor that modify the value of the factor provided.
+    /// </summary>
+    /// <param name="f">The <see cref="Factor"/> provided to get a new value from it.</param>
+    /// <param name="pend">The slope of the curve. Optional paramenter.</param>
+    /// <param name="ind">The vertical displacement of the curve. Optional paramenter.</param>
+    public Sigmoide(Factor f, float pend = 1, float ind = 0) : base(f)
+    {
+        this.m = pend;
+        this.c = ind;
+
+
+    }
+
+    #endregion
+
+    public override float getValue()
+    {
+        return (float)(1 / (1 + System.Math.Exp(-m * (factor.getValue() - c))));
+    }
+
+    /// <summary>
+    /// Sets a new value to the slope of the curve.
+    /// </summary>
+    public void setA(float _m)
+    {
+        this.m = _m;
+    }
+
+    /// <summary>
+    /// Sets a new value to the vertical displacement.
+    /// </summary>
+    public void setB(float _c)
+    {
+        this.c = _c;
+    }
+
+
+}
+
+public class Threshold : Curve
+{
+    #region variables
+
+    private float t;
+
+    #endregion
+
+    #region constructors
+    /// <summary>
+    /// Creates a linear function factor that modify the value of the factor provided.
+    /// </summary>
+    /// <param name="f">The <see cref="Factor"/> provided to get a new value from it.</param>
+    /// <param name="pend">The slope of the curve. Optional paramenter.</param>
+    /// <param name="ind">The vertical displacement of the curve. Optional paramenter.</param>
+    public Threshold(Factor f, float th) : base(f)
+    {
+        this.t = th;
+ 
+    }
+
+    #endregion
+
+    public override float getValue()
+    {
+        float u;
+
+        if (factor.getValue() < t) u = 0;
+        else u = 1;
+
+        return u;
+    }
+
+    /// <summary>
+    /// Sets a new value to the threshold.
+    /// </summary>
+    public void setT(float _m)
+    {
+        this.t = _m;
+    }
+   
 
 }
