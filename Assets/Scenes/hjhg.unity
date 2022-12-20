@@ -26714,6 +26714,7 @@ GameObject:
   - component: {fileID: 1237288222}
   - component: {fileID: 1237288221}
   - component: {fileID: 1237288220}
+  - component: {fileID: 1237288223}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -26779,14 +26780,40 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1237288219}
-  m_LocalRotation: {x: 0.20344974, y: 0.8350591, z: -0.11356638, w: 0.4983845}
-  m_LocalPosition: {x: -46.14, y: 10.22, z: 8.82}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 10.33, z: -43.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2008163203}
   m_RootOrder: 26
-  m_LocalEulerAnglesHint: {x: 23.108, y: 121.27, z: 14.262}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1237288223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1237288219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 436275a13d4459746955fc6db5953473, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _active: 1
+  _enableRotation: 1
+  _mouseSense: 1.8
+  _enableTranslation: 1
+  _translationSpeed: 55
+  _enableMovement: 1
+  _movementSpeed: 10
+  _boostedSpeed: 50
+  _boostSpeed: 304
+  _moveUp: 101
+  _moveDown: 113
+  _enableSpeedAcceleration: 1
+  _speedAccelerationFactor: 1.5
+  _initPositonButton: 114
 --- !u!1001 &1247094538
 PrefabInstance:
   m_ObjectHideFlags: 0
