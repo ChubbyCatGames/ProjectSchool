@@ -50,7 +50,7 @@ public class SchoolScript : MonoBehaviour
     /// <exception cref="System.NotImplementedException"></exception>
     private void InitializeWorld()
     {
-        for (int i = 0; i < numStudent; i++)
+        /*for (int i = 0; i < numStudent; i++)
         {
 
             studentList.AddRange(GameObject.FindGameObjectsWithTag("Student"));
@@ -65,8 +65,9 @@ public class SchoolScript : MonoBehaviour
         janitor.transform.position= initialPosJanitor.position;
         cook = Instantiate(prefabCook);
         cook.transform.position= initialPosCook.position;
-
+        */
         StartCoroutine(CountdownBell());
+        
 
     }
 

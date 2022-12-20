@@ -100,15 +100,16 @@ public class GhostBehaviour1 : MonoBehaviour
 
         Random.InitState(System.Environment.TickCount);
 
-        if (Random.Range(0, 1000000) == 1)
-        {
-
-        }
-
-        if (Input.GetKeyDown(KeyCode.I))
+        if (Random.Range(0, 10000) == 1)
         {
             GoToEat();
         }
+
+        if (Input.GetKeyDown(KeyCode.X))//This is to force all the students to eat
+        {
+            GoToEat();
+        }
+
     }
 
 
@@ -197,7 +198,6 @@ public class GhostBehaviour1 : MonoBehaviour
     {
         agent.enabled = true;
         chairAux.LeaveChair();
-        chairAux = null;
 
         foreach(Classroom c in classList)
         {
