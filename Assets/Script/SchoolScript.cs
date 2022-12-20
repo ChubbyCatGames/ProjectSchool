@@ -6,7 +6,7 @@ public class SchoolScript : MonoBehaviour
 {
     [SerializeField] int numStudent = 30;
     [SerializeField] int numTeacher= 10;
-    Bell bell;
+    public Bell bell;
 
     [Header("Prefabs")]
     [SerializeField] GameObject setBell;
@@ -47,7 +47,8 @@ public class SchoolScript : MonoBehaviour
     {
         for (int i = 0; i < numStudent; i++)
         {
-            studentList.Add(Instantiate(prefabStudent));
+
+            studentList.AddRange(GameObject.FindGameObjectsWithTag("Student"));
             studentList[i].transform.position = initialPosStudent.position;
         }
         for (int i = 0; i < numTeacher; i++)
@@ -75,12 +76,16 @@ public class SchoolScript : MonoBehaviour
     IEnumerator CountdownBell()
     {
         while(true) {
-            yield return new WaitForSeconds(Random.Range(20f,40f));
+            yield return new WaitForSeconds(Random.Range(2f,4f));
             Debug.Log("A CLASE");
             //IF BELLSTATUS DICE QUE TOCA CLASE
             bell.setValue(true);
             BoxCollider selectedClass = SelectRandomClass();
             //Foreach pj => lanzar una percepcion de que ha sonado la campana
+            foreach(var ghost in studentList)
+            {
+                ghost.GetComponent<ghostBehaviour>().bellRinging = true;
+            }
 
             //IF BELLSTATUS DICE QUE NO TOCA CLASE
             //A WANDEREAR JEFES

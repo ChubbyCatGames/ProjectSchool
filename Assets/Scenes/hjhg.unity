@@ -10365,6 +10365,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   numStudent: 30
   numTeacher: 10
+  bell: {fileID: 0}
   setBell: {fileID: 0}
   prefabStudent: {fileID: 2085638323854023495, guid: 960f48e1d954a5c45ab833cb9939cb4a, type: 3}
   prefabTeacher: {fileID: 4425470667515957216, guid: e33441e28404d484e87abb510c8ab12c, type: 3}
@@ -30008,7 +30009,7 @@ GameObject:
   - component: {fileID: 1442909892}
   m_Layer: 0
   m_Name: Ghost
-  m_TagString: Untagged
+  m_TagString: Student
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -30025,16 +30026,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2ad92db73c1730429e8a82ec6d743b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  classList: []
+  classList:
+  - {fileID: 1538115219}
+  - {fileID: 974115267}
+  - {fileID: 1298188472}
+  - {fileID: 605991592}
+  targets:
+  - {fileID: 2070318330}
+  - {fileID: 1066262672}
+  - {fileID: 1600344778}
+  - {fileID: 1300951201}
+  - {fileID: 785206356}
+  - {fileID: 1928482702}
   setBell: {fileID: 0}
   bellRinging: 0
   sitting: 0
   agent: {fileID: 1442909893}
+  school: {fileID: 536208440}
   destination: {x: 0, y: 0, z: 0}
   speed: 5
   maxStep: 1
   bellDestination: {x: 0, y: 0, z: 0}
-  school: {fileID: 536208440}
   timePee: 0
   needPee: 0
   timeEat: 0
@@ -30137,7 +30149,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1442909891}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.31, y: -0.8, z: -7.94}
+  m_LocalPosition: {x: -45.04, y: -0.8, z: -29.27}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

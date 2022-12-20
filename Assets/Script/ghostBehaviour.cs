@@ -7,6 +7,7 @@ public class ghostBehaviour : MonoBehaviour
 {
 
     [SerializeField] public List<BoxCollider> classList = new List<BoxCollider>();
+    [SerializeField] public List<Transform> targets;
     // BellStatus bell;
     Bell bell;
     [SerializeField] GameObject setBell;
@@ -14,6 +15,7 @@ public class ghostBehaviour : MonoBehaviour
     public bool sitting;
     //Navigation Agent
     public NavMeshAgent agent;
+    [SerializeField]public SchoolScript school;
 
     //MovimientodDelPersonaje
     public Vector3 destination;
@@ -33,10 +35,11 @@ public class ghostBehaviour : MonoBehaviour
     SequenceNode sequenceTurn;
     LeafNode isturnAround;
     LeafNode joking;
+    LeafNode wandering;
     //TimerDecoratorNode timerNode;
 
+
     //Behaviour Tree MEthods
-     public SchoolScript school;
     BoxCollider aula;
     //Utility System
     UtilitySystemEngine us;
@@ -64,12 +67,16 @@ public class ghostBehaviour : MonoBehaviour
     //BT
     private void CreateBehaviourTree()
     {
-        
+        ghostBT = new BehaviourTreeEngine(false);
 
         root = ghostBT.CreateSequenceNode("Root selector", false);
         selectorGoClass = ghostBT.CreateSelectorNode("Go to class");
         sequenceClass = ghostBT.CreateSequenceNode("Actions in class", false);
         goToClass = ghostBT.CreateLeafNode("Walk to class", WalkToClass, ArriveToClass);
+
+        wandering = ghostBT.CreateLeafNode("Prueba wandering", Wandering, CheckWandering);
+
+
         selectClassAction = ghostBT.CreateSelectorNode("Select class action");
         learn = ghostBT.CreateLeafNode("Learn in class", learnAction, checkLearning);
         sequenceTurn = ghostBT.CreateSequenceNode("Teacher sequence", false);
@@ -78,15 +85,16 @@ public class ghostBehaviour : MonoBehaviour
         //timerNode = ghostBT.CreateTimerNode("Timer", isturnAround, 5);
 
         //Children
-        
 
-        
+
         root.AddChild(selectorGoClass);
-
-        //root.AddChild(sequenceClass);
         selectorGoClass.AddChild(goToClass);
         selectorGoClass.AddChild(sequenceClass);
-        selectorGoClass.AddChild(wander);
+        selectorGoClass.AddChild(wandering);
+
+        //root.AddChild(sequenceClass);
+        //selectorGoClass.AddChild(goToClass);
+        //selectorGoClass.AddChild(wander);
 
         sequenceClass.AddChild(selectClassAction);
 
@@ -104,16 +112,18 @@ public class ghostBehaviour : MonoBehaviour
 
     //Go to class
     public virtual void WalkToClass() {
-        
-        if (bell.getValue())
+
+        Debug.Log("hdusohioshsfdos");
+        if (bellRinging)
         {
-            bell.setValue(false);
+            
             aula=SelectRandomClass();
             agent.destination = new Vector3(aula.transform.position.x, aula.transform.position.y, aula.transform.position.z);
             
             if (HasReachedDestination())
             {
                 sitting = true;
+                bellRinging = false;
             }
         }
         else
@@ -125,22 +135,18 @@ public class ghostBehaviour : MonoBehaviour
    
 
     public ReturnValues ArriveToClass() {
-        
+        Debug.Log(bellRinging);
         if (bellRinging && sitting)
         {
             return ReturnValues.Succeed;
         }
-        else if (!bellRinging)
-        {
-            return ReturnValues.Failed;
-        }
         else if (bellRinging && !sitting)
         {
-
             return ReturnValues.Running;
         }
         else
         {
+
             return ReturnValues.Running;
         }
     }
@@ -205,7 +211,7 @@ public class ghostBehaviour : MonoBehaviour
 
     private void Awake()
     {
-        bell = new Bell();
+        
         ghostBT = new BehaviourTreeEngine();
         agent = GetComponent<NavMeshAgent>();
         agent.SetDestination(transform.position);
@@ -214,7 +220,7 @@ public class ghostBehaviour : MonoBehaviour
     void Start()
     {
 
-
+        bell = school.bell;
         CreateUtilitySystem();
         CreateBehaviourTree();
         
@@ -224,26 +230,17 @@ public class ghostBehaviour : MonoBehaviour
     void Update()
     {
 
-        if (bell.getValue())
-        {
-            bellRinging = true;
-        }
-        else if (!bell.getValue())
-        {
-            bellRinging = false;
-        }
-
 
         if (!bellRinging)
         {
-            Wandering();
+            //Wandering();
         }
 
         
 
 
         ghostBT.Update();
-        us.Update();
+        //us.Update();
 
         
     }
@@ -258,8 +255,10 @@ public class ghostBehaviour : MonoBehaviour
         if (agent.remainingDistance < agent.stoppingDistance)
         {
             // Generate a random position within the limits of the stage
-            Vector3 randomPosition = new Vector3(Random.Range(-10, 10), 0, Random.Range(-10, 10));
+            //Vector3 randomPosition = new Vector3(Random.Range(-10, 10), 0, Random.Range(-10, 10));
 
+            Vector3 randomPosition = SelectRandomPosition();
+            Debug.Log(randomPosition);
 
 
             // Find the closest point on the NavMesh to the random position
@@ -269,19 +268,31 @@ public class ghostBehaviour : MonoBehaviour
 
 
             // Set the character's destination to the closest point on the NavMesh
-            agent.SetDestination(hit.position);
+            agent.SetDestination(randomPosition);
         }
 
-
+       
 
         // Check if the character is still on the NavMesh
         if (!agent.isOnNavMesh)
         {
-            // Move the character back onto the NavMesh
+            // Move the character back onto the NavMeshsa
             agent.Warp(transform.position);
         }
 
         Debug.Log("Wandereando");
+    }
+
+    ReturnValues CheckWandering()
+    {
+        if (bellRinging)
+        {
+            return ReturnValues.Succeed;
+        }
+        else
+        {
+            return ReturnValues.Running;
+        }
     }
 
     void GenerateMovement()
@@ -290,8 +301,16 @@ public class ghostBehaviour : MonoBehaviour
     agent.SetDestination(Random.insideUnitSphere * agent.areaMask);
     }
 
+    public Vector3 SelectRandomPosition()
+    {
+        Random.seed = (int) Time.time;
+        int random = Random.Range(0, targets.Count - 1);
+        Debug.Log(random);
+        Vector3 position = targets[random].position;
 
-    
+        return position;
+    }
+
 
     void UrinatingAction()
     {
