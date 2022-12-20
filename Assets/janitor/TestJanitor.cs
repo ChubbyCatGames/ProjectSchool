@@ -8,6 +8,7 @@ public class TestJanitor : MonoBehaviour
     [SerializeField] private SignsController scJan;
     private NavMeshAgent meshAgent;
     private StateMachineEngine fsm;
+    private string interruptedState;
 
     private ArriveToDestination arriveToDestination;
     //destinos
@@ -44,7 +45,7 @@ public class TestJanitor : MonoBehaviour
 
         // State waitingForCook = fsm.CreateState("waitingForCook", waitingForCookAction);
         //State flirt = fsm.CreateState("flirt", BlueAction);
-        State clean = fsm.CreateState("clean", CleanAction);
+        State cleanS = fsm.CreateState("cleanS", CleanAction);
 
         //Perception
         arriveToDestination = fsm.CreatePerception<ArriveToDestination>(new ArriveToDestination());
@@ -62,6 +63,8 @@ public class TestJanitor : MonoBehaviour
         fsm.CreateTransition("flirt", walkToPA, started, flirt);
 
         fsm.CreateTransition("third", flirt, started, walkToPB);
+
+        fsm.CreateTransition("clean", walk, started,cleanS);
         //fsm.CreateTransition("nearWarehuse", walk, nearWarehuse, flirt);
         //fsm.CreateTransition("cookEvent", flirt, cookEvent, walk);
 
@@ -159,11 +162,12 @@ public class TestJanitor : MonoBehaviour
         //enAlmacen = true
 
     }
-    /*
+    
     private void OnEnable()
     {
-        controladorEventos.current.ManchaCercaPj.AddListener(CleanAction);
-    }*/
+        //Debug.Log("Enable");
+        controlEvento.current.ManchaCercaPj.AddListener(FireClean);
+    }
     void WalkAction()
     {
 
@@ -195,9 +199,15 @@ public class TestJanitor : MonoBehaviour
 
     }
 
+    void FireClean()
+    {
+        interruptedState = fsm.GetCurrentState().Name;
+        fsm.Fire("clean");
+    }
     void CleanAction()
     {
-        //Debug.Log("limpiarrr");
+        StartCoroutine(Clean());
+        
     }
 
     void FlirtAction()
@@ -222,5 +232,19 @@ public class TestJanitor : MonoBehaviour
         scJan.RemoveSign();
         flagForCook = false;
         endFlirt = true;
+    }
+
+    IEnumerator Clean()
+    {
+        Debug.Log("LIMPIANDO");
+
+        scJan.ShowNewSign(1);
+        meshAgent.speed = 0;
+        yield return new WaitForSeconds(3.0f);
+        //Debug.Log("FIN");
+        scJan.RemoveSign();
+        meshAgent.speed = 3.5f;
+        //if (interruptedState == "walk")
+        //  fsm.Fire("started");
     }
 }
