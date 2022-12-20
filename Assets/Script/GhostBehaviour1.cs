@@ -8,12 +8,15 @@ public class GhostBehaviour1 : MonoBehaviour
     private StateMachineEngine fsm;
     UtilitySystemEngine us;
 
-    private NavMeshAgent agent;
+    public NavMeshAgent agent;
 
     private ClassroomChair chairAux = null;
 
     [SerializeField] private List<Transform> targets;
     [SerializeField] private List<Classroom> classList;
+
+    [SerializeField] public DiningRoomController dc;
+    [SerializeField] private SchoolScript sc;
 
     //Utility System variables
     public float timePee;
@@ -36,6 +39,8 @@ public class GhostBehaviour1 : MonoBehaviour
 
     private void Awake()
     {
+        sc.bellEvent.AddListener(BellRings);
+        sc.bellEvent.AddListener(ClassEnds);
 
         agent = GetComponent<NavMeshAgent>();
 
@@ -63,6 +68,7 @@ public class GhostBehaviour1 : MonoBehaviour
         Transition wandering_to_goClass = fsm.CreateTransition("Wander_to_goClass", wanderingState, isGoingClass, goingClassState);
         Transition goClass_to_attendClass = fsm.CreateTransition("GoClass_to_attendClass", goingClassState, isAttendingClass, attendingClassState);
         Transition attendClass_to_wandering = fsm.CreateTransition("AttendClass_to_wander", attendingClassState, isWandering, wanderingState);
+        Transition wandering_to_idle = fsm.CreateTransition("Wander_to_idle", wanderingState, isGoingClass, idleState);
 
         CreateUtilitySystem();
 
@@ -73,6 +79,8 @@ public class GhostBehaviour1 : MonoBehaviour
     private void Update()
     {
         fsm.Update();
+
+        print(fsm.GetCurrentState().Name);
 
         if(fsm.GetCurrentState().Name == "Wandering")
         {
@@ -90,14 +98,16 @@ public class GhostBehaviour1 : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.P))
+        Random.InitState(System.Environment.TickCount);
+
+        if (Random.Range(0, 1000000) == 1)
         {
-            BellRings();
+
         }
 
-        if (Input.GetKeyDown(KeyCode.O))
+        if (Input.GetKeyDown(KeyCode.I))
         {
-            ClassEnds();
+            GoToEat();
         }
     }
 
@@ -197,6 +207,24 @@ public class GhostBehaviour1 : MonoBehaviour
         fsm.Fire("AttendClass_to_wander");
     }
 
+    private void GoToEat()
+    {
+        fsm.Fire("Wander_to_idle");
+        dc.ghostsList.Add(this);
+    }
+
+    public void EndOrder()
+    {
+        Table table = dc.SelectRandomTable();
+
+        Random.InitState(System.Environment.TickCount);
+        int random = Random.Range(0, table.chairs.Count);
+        Vector3 chair = table.chairs[random].position;
+        agent.destination = chair;
+
+        StartCoroutine(EatRoutine(table, chair));
+    }
+
     private Vector3 SelectRandomPosition()
     {
         Random.InitState(System.Environment.TickCount);
@@ -213,6 +241,24 @@ public class GhostBehaviour1 : MonoBehaviour
         int randomClass = Random.Range(0, classList.Count);
         return classList[randomClass];
     }
+
+    //Coroutines
+
+    IEnumerator EatRoutine(Table table, Vector3 chair)
+    {
+        yield return new WaitUntil(() => HasReachedDestination());
+
+        agent.enabled = false;
+        transform.position = chair;
+
+        yield return new WaitForSeconds(30f);
+
+        agent.enabled = true;
+        table.SetHasTray(true);
+        fsm.Fire("Idle_to_wander");
+
+    }
+
 
     //Utility system
     private void CreateUtilitySystem()
@@ -238,6 +284,8 @@ public class GhostBehaviour1 : MonoBehaviour
         us.CreateUtilityAction("Eat", OrderingFoodAction, curveEating);
         us.CreateUtilityAction("Ghosting", GhostingAction, curveGhosting);
     }
+
+
 
     //ACCIONES DEL SISTEMA DE UTILIDAD
 

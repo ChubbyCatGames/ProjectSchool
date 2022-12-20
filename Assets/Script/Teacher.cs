@@ -12,8 +12,12 @@ public class Teacher : MonoBehaviour
     [SerializeField] private List<Transform> targets;
     [SerializeField] private Classroom assignedClassroom;
 
+    [SerializeField] private SchoolScript sc;
+    
     private void Awake()
     {
+        sc.bellEvent.AddListener(BellRings);
+        sc.bellEventEnd.AddListener(ClassEnds);
 
         agent = GetComponent<NavMeshAgent>();
 
@@ -60,16 +64,6 @@ public class Teacher : MonoBehaviour
             {
                 fsm.Fire("GoClass_to_attendClass");
             }
-        }
-
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            BellRings();
-        }
-
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            ClassEnds();
         }
     }
 

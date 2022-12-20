@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class SchoolScript : MonoBehaviour
 {
@@ -30,7 +31,11 @@ public class SchoolScript : MonoBehaviour
 
     [Header("Classes")]
     [SerializeField]public List<BoxCollider> classList = new List<BoxCollider>();
-    
+
+    public UnityEvent bellEvent;
+    public UnityEvent bellEventEnd;
+    bool bellbool = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -76,16 +81,26 @@ public class SchoolScript : MonoBehaviour
     IEnumerator CountdownBell()
     {
         while(true) {
-            yield return new WaitForSeconds(Random.Range(2f,4f));
+            yield return new WaitForSeconds(Random.Range(50f,70f));
             Debug.Log("A CLASE");
             //IF BELLSTATUS DICE QUE TOCA CLASE
             bell.setValue(true);
             BoxCollider selectedClass = SelectRandomClass();
-            //Foreach pj => lanzar una percepcion de que ha sonado la campana
-            foreach(var ghost in studentList)
+
+            if (!bellbool)
             {
-                ghost.GetComponent<ghostBehaviour>().bellRinging = true;
+                bellEvent?.Invoke();
             }
+            else
+            {
+                bellEventEnd?.Invoke();
+            }
+            
+            //Foreach pj => lanzar una percepcion de que ha sonado la campana
+            //foreach(var ghost in studentList)
+            //{
+            //    ghost.GetComponent<ghostBehaviour>().bellRinging = true;
+            //}
 
             //IF BELLSTATUS DICE QUE NO TOCA CLASE
             //A WANDEREAR JEFES

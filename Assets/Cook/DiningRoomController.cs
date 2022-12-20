@@ -6,7 +6,7 @@ public class DiningRoomController : MonoBehaviour
 {
     [SerializeField] private List<Table> tablesList = new List<Table>();
 
-    [SerializeField] private List<ghostBehaviour> ghostsList = new List<ghostBehaviour>();
+    [SerializeField] public List<GhostBehaviour1> ghostsList = new List<GhostBehaviour1>();
     [SerializeField] private Transform queue;
 
     [SerializeField] private CookBehaviour cookReference;
@@ -25,14 +25,16 @@ public class DiningRoomController : MonoBehaviour
     private void Update()
     {
         //For testing purposes:
-        if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKeyDown(KeyCode.M))
         {
             tablesList[Random.Range(0, tablesList.Count)].SetHasTray(true);
         }
-        if (Input.GetKeyDown(KeyCode.S))
+        if (Input.GetKeyDown(KeyCode.X))
         {
-            ghostsList.Add(new ghostBehaviour());
+            ghostsList.Add(new GhostBehaviour1());
         }
+
+        DisplayQueue();
     }
 
 
@@ -111,13 +113,19 @@ public class DiningRoomController : MonoBehaviour
 
     private void DisplayQueue()//Call when necesary to show or update the queue of ghosts
     {
-        float distance = 1f;
+        float distance = 3f;
         for (int i=0; i<ghostsList.Count; i++)
         {
             ghostsList[i].agent.destination = new Vector3(queue.position.x, ghostsList[i].transform.position.y, queue.position.z - i * distance);
         }
     }
 
+    public Table SelectRandomTable()
+    {
+        Random.InitState(System.Environment.TickCount);
+        int random = Random.Range(0, tablesList.Count);
+        return tablesList[random];
+    }
 
     //Coroutines
     IEnumerator CleaningTrayRoutine(List<Table> list)
@@ -150,6 +158,7 @@ public class DiningRoomController : MonoBehaviour
 
     IEnumerator AttendingStudentRoutine(Transform foodTransform)
     {
+        yield return new WaitUntil(() => ghostsList[0].HasReachedDestination());
         yield return new WaitForSeconds(2f);
 
         cookReference.Move(traysShelf);
@@ -164,6 +173,8 @@ public class DiningRoomController : MonoBehaviour
 
         yield return new WaitUntil(() => cookReference.HasReachedDestination());
         yield return new WaitForSeconds(1f);
+
+        ghostsList[0].EndOrder();
 
         ghostsList.RemoveAt(0);
 

@@ -7,7 +7,7 @@ public class Table : MonoBehaviour
     private bool hasTray;
 
     //Chairs
-    [SerializeField] private List<Transform> chairs;
+    [SerializeField] public List<Transform> chairs;
 
     //Tray 
     [SerializeField] private GameObject tray;

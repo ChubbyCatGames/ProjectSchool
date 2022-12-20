@@ -31,6 +31,8 @@ public class CookBehaviour : MonoBehaviour
     //Control variables
     private bool isAttendingStudent = false;
 
+    //Janitor
+    [SerializeField] TestJanitor janitor;
 
     void Awake()
     {
@@ -96,6 +98,7 @@ public class CookBehaviour : MonoBehaviour
 
     void Update()
     {
+        print(main_fsm.GetCurrentState().Name);
         wandering_fsm.Update();
         main_fsm.Update();
 
@@ -141,8 +144,6 @@ public class CookBehaviour : MonoBehaviour
             if (HasReachedDestination())
             {
                 sc.ShowNewSign(4);
-
-                EndJanitor();
             }
         }
 
@@ -167,6 +168,11 @@ public class CookBehaviour : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.V))
         {
             EndJanitor();
+        }
+
+        if (janitor.flagForCook)
+        {
+            JanitorCalls();
         }
     }
 
@@ -232,6 +238,8 @@ public class CookBehaviour : MonoBehaviour
 
     private void JanitorCalls()
     {
+        StopCoroutine(StartTimer());
+
         main_fsm.Fire("Wandering_to_janitor");
     }
 
