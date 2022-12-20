@@ -67,7 +67,7 @@ public class ghostBehaviour : MonoBehaviour
     //BT
     private void CreateBehaviourTree()
     {
-        ghostBT = new BehaviourTreeEngine(false);
+        
 
         root = ghostBT.CreateSequenceNode("Root selector", false);
         selectorGoClass = ghostBT.CreateSelectorNode("Go to class");

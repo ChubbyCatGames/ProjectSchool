@@ -5,18 +5,26 @@ using UnityEngine;
 public class Classroom : MonoBehaviour
 {
     [SerializeField] private List<ClassroomChair> chairsList = new List<ClassroomChair>();
+    [SerializeField] public Vector3 techerPos;
+
     public bool isHappeningClass = false;
 
-    public ClassroomChair SelectChair()
+    private ClassroomChair SelectChair()
     {
         ClassroomChair chair;
         int random;
         do
         {
+            Random.InitState(System.Environment.TickCount);
             random = Random.Range(0, chairsList.Count);
             chair = chairsList[random];
 
-        } while (!chairsList[random].occupied);
+            if (!CheckIfRoom())
+            {
+                return null;
+            }
+
+        } while (chairsList[random].occupied);
 
         return chair;
     }
@@ -29,8 +37,16 @@ public class Classroom : MonoBehaviour
         return chair;
     }
 
-    public void LeaveChair(ClassroomChair chair)
+    public bool CheckIfRoom()
     {
-        chair.occupied = false;
+        bool b = false;
+
+        foreach(ClassroomChair c in chairsList)
+        {
+            if (!c.occupied) b = true;
+        }
+
+        return true;
     }
+
 }
