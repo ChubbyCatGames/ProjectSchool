@@ -33,7 +33,7 @@ public class TestJanitor : MonoBehaviour
         meshAgent = GetComponent<NavMeshAgent>();
         //posDest = Dest.transform.position;
         posDest = targets[n].transform.position;
-        tope = targets.Count;
+        //tope = targets.Count;
 
         //STATES
         State idle = fsm.CreateEntryState("idle");
@@ -104,10 +104,10 @@ public class TestJanitor : MonoBehaviour
 
         //Debug.Log(fsm.GetCurrentState().Name);
         //Debug.Log(arriveToDestination.Check2());
-
+        //Debug.Log(Vector3.Distance(transform.position, targets[0].transform.position));
         if (Vector3.Distance(transform.position, targets[0].transform.position) < 0.8f && fsm.GetCurrentState().Name == "walk")
         {
-            Debug.Log("EjecutaSegundo");
+            //Debug.Log("EjecutaSegundo");
 
             fsm.Fire("second");
 
