@@ -15,18 +15,20 @@ public class TestMancha : MonoBehaviour
     // Variables que no se deben tocar
     private bool generandoMancha = false;
     private Vector3 posicionMancha = Vector3.zero;
-    private bool hayMancha = true;
-    //private bool hayMancha = false;
+    //private bool hayMancha = true;
+    private bool hayMancha = false;
     [SerializeField] GameObject personaje;
     [SerializeField] int enRadio;
     bool eventoMancha = false;
+
+    //lista posibles targets para mancha
 
     //*******************************************************
 
     void Start()
     {
-        // Empezamos sin seta
-        //HazInvisible();
+        // Empezamos sin mancha
+        HazInvisible();
     }
 
     //*******************************************************
@@ -34,8 +36,8 @@ public class TestMancha : MonoBehaviour
     void Update()
     {
         // Si no hay seta y no estamos ya generandola, lanzamos la rutina de generacion
-        //if (!generandoMancha && !hayMancha)
-          //  StartCoroutine(GeneradorManchas());
+        if (!generandoMancha && !hayMancha)
+            StartCoroutine(GeneradorManchas());
 
         if (hayMancha)
         {
@@ -76,7 +78,8 @@ public class TestMancha : MonoBehaviour
         // Genera nueva seta pasado el tiempo
         hayMancha = true;
         HazVisible();
-        posicionMancha = new Vector3(Random.Range(-radioManchas, radioManchas), 0.0f, Random.Range(-radioManchas, radioManchas));
+        posicionMancha = new Vector3(Random.Range(-4.7f, -7.1f), -2.19f, Random.Range(-22.0f, -2.0f));
+        //posicionMancha = new Vector3(Random.Range(-radioManchas, radioManchas), 0.0f, Random.Range(-radioManchas, radioManchas));
         transform.position = posicionMancha;
         generandoMancha = false;
     }
@@ -89,7 +92,7 @@ public class TestMancha : MonoBehaviour
     /// </summary>
     public void HazInvisible()
     {
-        transform.position = new Vector3(transform.position.x, -10.0f, transform.position.z);
+        transform.position = new Vector3(transform.position.x, -20.0f, transform.position.z);
     }
 
     //*******************************************************
@@ -109,7 +112,7 @@ public class TestMancha : MonoBehaviour
     /// Indica si hay una seta visible
     /// </summary>
     /// <returns></returns>
-    public bool HaySeta()
+    public bool HayMancha()
     {
         return hayMancha;
     }

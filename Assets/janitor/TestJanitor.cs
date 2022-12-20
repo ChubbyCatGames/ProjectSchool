@@ -16,6 +16,7 @@ public class TestJanitor : MonoBehaviour
     [SerializeField] private List<GameObject> targets;
     private int n = 0;
     private int tope;
+    private Vector3 origin;
     //ref cocinera
     [SerializeField] private GameObject rcook;
     
@@ -33,6 +34,7 @@ public class TestJanitor : MonoBehaviour
         fsm = new StateMachineEngine();
         meshAgent = GetComponent<NavMeshAgent>();
         //posDest = Dest.transform.position;
+        origin = meshAgent.transform.position;
         posDest = targets[n].transform.position;
         //tope = targets.Count;
 
@@ -42,6 +44,7 @@ public class TestJanitor : MonoBehaviour
         State walkToPA = fsm.CreateState("walkToPA", WalkToPAAction);
         State walkToPB = fsm.CreateState("walkToPB", WalkToPBAction);
         State flirt = fsm.CreateState("flirt", FlirtAction);
+        State originAgain = fsm.CreateState("originAgain", OriginAgainAction);
 
         // State waitingForCook = fsm.CreateState("waitingForCook", waitingForCookAction);
         //State flirt = fsm.CreateState("flirt", BlueAction);
@@ -50,11 +53,7 @@ public class TestJanitor : MonoBehaviour
         //Perception
         arriveToDestination = fsm.CreatePerception<ArriveToDestination>(new ArriveToDestination());
         Perception started = fsm.CreatePerception<PushPerception>();
-        //Perception nearWarehuse =fsm.CreatePerception<PushPerception>();
-        //Perception cookEvent = fsm.CreatePerception<PushPerception>();
-
-        Perception stainAppears = fsm.CreatePerception<PushPerception>();
-        Perception staincCleaned = fsm.CreatePerception<PushPerception>();
+    
 
         //Transition
         fsm.CreateTransition("started", idle, started, walk);
@@ -65,6 +64,10 @@ public class TestJanitor : MonoBehaviour
         fsm.CreateTransition("third", flirt, started, walkToPB);
 
         fsm.CreateTransition("clean", walk, started,cleanS);
+        fsm.CreateTransition("continue", cleanS, started, walk);
+
+        fsm.CreateTransition("originAgain", walkToPB, started, originAgain);
+        fsm.CreateTransition("restart", originAgain, started, idle);
         //fsm.CreateTransition("nearWarehuse", walk, nearWarehuse, flirt);
         //fsm.CreateTransition("cookEvent", flirt, cookEvent, walk);
 
@@ -98,7 +101,7 @@ public class TestJanitor : MonoBehaviour
 
         }*/
 
-
+        Debug.Log(fsm.GetCurrentState().Name);
         if (posDest != null && fsm.GetCurrentState().Name =="idle")
         {
             fsm.Fire("started");
@@ -110,7 +113,7 @@ public class TestJanitor : MonoBehaviour
         //Debug.Log(Vector3.Distance(transform.position, targets[0].transform.position));
         if (Vector3.Distance(transform.position, targets[0].transform.position) < 0.8f && fsm.GetCurrentState().Name == "walk")
         {
-            //Debug.Log("EjecutaSegundo");
+            Debug.Log("EjecutaSegundo");
 
             fsm.Fire("second");
 
@@ -121,7 +124,7 @@ public class TestJanitor : MonoBehaviour
         //Debug.Log(Vector3.Distance(transform.position, targets[1].transform.position) < 2.0f);
         if (fsm.GetCurrentState().Name == "walkToPA" && Vector3.Distance(transform.position, targets[1].transform.position) < 2.0f)
         {
-            //Debug.Log("EN segundo destino");
+            Debug.Log("EN segundo destino");
             if (endFlirt == false)
             {
                 fsm.Fire("flirt");
@@ -134,10 +137,20 @@ public class TestJanitor : MonoBehaviour
             if (endFlirt == true)
             {
                 fsm.Fire("third");
+                
             }
         }
 
+        if(fsm.GetCurrentState().Name == "walkToPB" && Vector3.Distance(transform.position, targets[2].transform.position) < 2.0f)
+        {
+            fsm.Fire("originAgain");
+        }
 
+        
+        if (fsm.GetCurrentState().Name == "originAgain" && Vector3.Distance(transform.position, origin) < 2.0f)
+        {
+            fsm.Fire("restart");
+        }
 
         /*
 
@@ -207,7 +220,6 @@ public class TestJanitor : MonoBehaviour
     void CleanAction()
     {
         StartCoroutine(Clean());
-        
     }
 
     void FlirtAction()
@@ -220,6 +232,17 @@ public class TestJanitor : MonoBehaviour
         //StopCoroutine(Flirt());
         //flirt();
         //flagForCook = false;
+    }
+
+    void OriginAgainAction()
+    {
+        meshAgent.destination = origin;
+
+        meshAgent.speed = 3.5f;
+        // meshAgent.destination = posDest;
+        arriveToDestination.SetDestination(meshAgent.destination);
+        endFlirt = false;
+        n = 0;
     }
 
     IEnumerator Flirt()
@@ -244,7 +267,7 @@ public class TestJanitor : MonoBehaviour
         //Debug.Log("FIN");
         scJan.RemoveSign();
         meshAgent.speed = 3.5f;
-        //if (interruptedState == "walk")
-        //  fsm.Fire("started");
+        fsm.Fire("continue");
+        //endClean = true;
     }
 }
