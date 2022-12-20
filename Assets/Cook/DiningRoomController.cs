@@ -27,7 +27,7 @@ public class DiningRoomController : MonoBehaviour
         //For testing purposes:
         if (Input.GetKeyDown(KeyCode.A))
         {
-            tablesList[Random.Range(0, tablesList.Count)].hasTray = true;
+            tablesList[Random.Range(0, tablesList.Count)].SetHasTray(true);
         }
         if (Input.GetKeyDown(KeyCode.S))
         {
@@ -43,7 +43,7 @@ public class DiningRoomController : MonoBehaviour
 
         foreach (Table t in tablesList)
         {
-            if (t.hasTray)
+            if (t.GetHasTray())
             {
                 b = true;
                 break;
@@ -64,7 +64,7 @@ public class DiningRoomController : MonoBehaviour
         List<Table> path = new List<Table>();
         foreach(Table t in tablesList)
         {
-            if (t.hasTray) path.Add(t);
+            if (t.GetHasTray()) path.Add(t);
         }
 
         StartCoroutine(CleaningTrayRoutine(path));
@@ -132,7 +132,7 @@ public class DiningRoomController : MonoBehaviour
             yield return new WaitUntil(() => cookReference.HasReachedDestination());
 
             //Update the State of the table
-            t.hasTray = false;
+            t.SetHasTray(false);
 
             MustCleanTray();
 

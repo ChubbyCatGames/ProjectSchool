@@ -9,7 +9,7 @@ public class CookBehaviour : MonoBehaviour
     private NavMeshAgent agent;
 
     //Signs controller
-    [SerializeField] private SignsController sc;
+    [SerializeField] public SignsController sc;
 
     //Target Positions
     [SerializeField] private Transform sinkTransform;
@@ -140,6 +140,8 @@ public class CookBehaviour : MonoBehaviour
         {
             if (HasReachedDestination())
             {
+                sc.ShowNewSign(4);
+
                 EndJanitor();
             }
         }
@@ -149,6 +151,9 @@ public class CookBehaviour : MonoBehaviour
             if (HasReachedDestination())
             {
                 isAttendingStudent = true;
+
+                sc.ShowNewSign(3);
+
                 room.MustAttendStudent();
             }
         }
@@ -249,12 +254,19 @@ public class CookBehaviour : MonoBehaviour
     public void EndJanitor()
     {
         main_fsm.Fire("Janitor_to_wandering");
+
+        sc.RemoveSign();
+
         MoveToNewDestiny();
     }
 
     public void EndStudent()
     {
         main_fsm.Fire("Student_to_wandering");
+
+        isAttendingStudent = false;
+        sc.RemoveSign();
+
         MoveToNewDestiny();
     }
 
