@@ -102,7 +102,7 @@ public class Teacher : MonoBehaviour
 
     private void GoingClass()
     {
-        agent.destination = assignedClassroom.techerPos;
+        agent.destination = assignedClassroom.techerPos.position;
     }
 
     private void AttendingClass()
@@ -149,13 +149,6 @@ public class Teacher : MonoBehaviour
         Vector3 position = targets[random].position;
 
         return position;
-    }
-
-    private Classroom SelectRandomClass()
-    {
-        Random.InitState(System.Environment.TickCount);
-        int randomClass = Random.Range(0, classList.Count);
-        return classList[randomClass];
     }
 
 }

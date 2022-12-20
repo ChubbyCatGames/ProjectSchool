@@ -5,7 +5,7 @@ using UnityEngine;
 public class Classroom : MonoBehaviour
 {
     [SerializeField] private List<ClassroomChair> chairsList = new List<ClassroomChair>();
-    [SerializeField] public Vector3 techerPos;
+    [SerializeField] public Transform techerPos; 
 
     public bool isHappeningClass = false;
 
