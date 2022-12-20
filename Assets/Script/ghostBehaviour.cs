@@ -5,8 +5,11 @@ using UnityEngine.AI;
 
 public class ghostBehaviour : MonoBehaviour
 {
-    public List<Transform> targets;
-    public BellStatus bellState { get; set; }
+
+    [SerializeField] public List<BoxCollider> classList = new List<BoxCollider>();
+    // BellStatus bell;
+    Bell bell;
+    [SerializeField] GameObject setBell;
     public bool bellRinging=false;
     public bool sitting;
     //Navigation Agent
@@ -102,9 +105,10 @@ public class ghostBehaviour : MonoBehaviour
     //Go to class
     public virtual void WalkToClass() {
         
-        if (bellRinging==true)
+        if (bell.getValue())
         {
-            aula=school.SelectRandomClass();
+            bell.setValue(false);
+            aula=SelectRandomClass();
             agent.destination = new Vector3(aula.transform.position.x, aula.transform.position.y, aula.transform.position.z);
             
             if (HasReachedDestination())
@@ -201,6 +205,7 @@ public class ghostBehaviour : MonoBehaviour
 
     private void Awake()
     {
+        bell = new Bell();
         ghostBT = new BehaviourTreeEngine();
         agent = GetComponent<NavMeshAgent>();
         agent.SetDestination(transform.position);
@@ -209,7 +214,6 @@ public class ghostBehaviour : MonoBehaviour
     void Start()
     {
 
-        bellRinging = false;
 
         CreateUtilitySystem();
         CreateBehaviourTree();
@@ -219,14 +223,16 @@ public class ghostBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (bellState== BellStatus.Active)
+
+        if (bell.getValue())
         {
             bellRinging = true;
         }
-        else if (bellState == BellStatus.Unactive)
+        else if (!bell.getValue())
         {
             bellRinging = false;
         }
+
 
         if (!bellRinging)
         {
@@ -252,8 +258,8 @@ public class ghostBehaviour : MonoBehaviour
         if (agent.remainingDistance < agent.stoppingDistance)
         {
             // Generate a random position within the limits of the stage
-            //Vector3 randomPosition = new Vector3(Random.Range(-10, 10), 0, Random.Range(-10, 10));
-            Vector3 randomPosition = SelectRandomPosition();
+            Vector3 randomPosition = new Vector3(Random.Range(-10, 10), 0, Random.Range(-10, 10));
+
 
 
             // Find the closest point on the NavMesh to the random position
@@ -276,14 +282,6 @@ public class ghostBehaviour : MonoBehaviour
         }
 
         Debug.Log("Wandereando");
-    }
-
-    private Vector3 SelectRandomPosition()
-    {
-        int random = Random.Range(0, targets.Count-1);
-        Vector3 position = targets[random].position;
-
-        return position;
     }
 
     void GenerateMovement()
@@ -315,6 +313,12 @@ public class ghostBehaviour : MonoBehaviour
     protected virtual void GhostingAction()
     {
 
+    }
+
+    public BoxCollider SelectRandomClass()
+    {
+        int randomClass = Random.Range(0, classList.Count - 1);
+        return classList[randomClass];
     }
 
 }

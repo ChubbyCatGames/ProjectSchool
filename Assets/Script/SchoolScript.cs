@@ -6,9 +6,10 @@ public class SchoolScript : MonoBehaviour
 {
     [SerializeField] int numStudent = 30;
     [SerializeField] int numTeacher= 10;
-    public bool isRinging = false;
+    Bell bell;
 
     [Header("Prefabs")]
+    [SerializeField] GameObject setBell;
     [SerializeField] GameObject prefabStudent;
     [SerializeField] GameObject prefabTeacher;
     [SerializeField] GameObject prefabJanitor;
@@ -33,6 +34,7 @@ public class SchoolScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        bell = new Bell();
         InitializeWorld();
 
 
@@ -75,14 +77,15 @@ public class SchoolScript : MonoBehaviour
         while(true) {
             yield return new WaitForSeconds(Random.Range(20f,40f));
             Debug.Log("A CLASE");
-            isRinging = true;
             //IF BELLSTATUS DICE QUE TOCA CLASE
+            bell.setValue(true);
             BoxCollider selectedClass = SelectRandomClass();
             //Foreach pj => lanzar una percepcion de que ha sonado la campana
 
             //IF BELLSTATUS DICE QUE NO TOCA CLASE
             //A WANDEREAR JEFES
         }
+
     }
 
     public BoxCollider SelectRandomClass()

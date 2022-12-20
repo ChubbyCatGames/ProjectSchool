@@ -5,28 +5,30 @@ using UnityEngine.UI;
 
 public class SetBellStatus : MonoBehaviour
 {
-
+    public bool isActive = false;
 
     private GameObject ghost;
     private ghostBehaviour ghostBT;
-    private Slider bellStatusSlider;
     private SchoolScript school;
+    private BellStatus bellStatus;
     // Start is called before the first frame update
     void Start()
     {
-        bellStatusSlider = GetComponent<Slider>();
+        bellStatus = BellStatus.Unactive;
     }
 
-    public void SetBellState()
+    public void SetBellStateActive()
     {
-        if (school.isRinging)
-        {
-            ghostBT.bellState = BellStatus.Active;
-        }
-        else if(!school.isRinging) { ghostBT.bellState = BellStatus.Unactive; }
-
-       
+        bellStatus = BellStatus.Active;
+        isActive = true;
+        
     }
 
-  
+    public void SetBellStateUnactive()
+    {
+        bellStatus = BellStatus.Unactive;
+        isActive = false;
+    }
+
+
 }
