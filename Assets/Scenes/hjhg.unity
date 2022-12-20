@@ -6596,7 +6596,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   signsList:
   - {fileID: 21300000, guid: 1f7db64500342f14f9f563d5833328a0, type: 3}
-  - {fileID: 21300000, guid: 51c2a9d1f78162d4baa18a3c6c035033, type: 3}
+  - {fileID: 21300000, guid: 49b6cdfbc6ef6544f8731f0fe1ccc99b, type: 3}
 --- !u!212 &316209619
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -6657,7 +6657,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 316209617}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 3.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -24836,6 +24836,13 @@ MonoBehaviour:
   - {fileID: 974115268}
   - {fileID: 1298188473}
   - {fileID: 605991593}
+  timePee: 0
+  needPee: 0
+  timeEat: 0
+  needEat: 0
+  activeNeed: 0
+  timeGhosting: 0
+  needGhosting: 0
 --- !u!1001 &1129973371
 PrefabInstance:
   m_ObjectHideFlags: 0
