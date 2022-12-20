@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 33782075651415386}
   - component: {fileID: 23326161723584710}
   - component: {fileID: 7410453516586193810}
+  - component: {fileID: 2278367067018533399}
   m_Layer: 0
   m_Name: chair1
   m_TagString: Untagged
@@ -98,3 +99,16 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: e3fd7e9d6b3f64648beef3391d3952d6, type: 3}
+--- !u!114 &2278367067018533399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1844930292423774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7848b589f8056a64ea99445a5c58efee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  occupied: 0
