@@ -34,15 +34,12 @@ public class SchoolScript : MonoBehaviour
 
     public UnityEvent bellEvent;
     public UnityEvent bellEventEnd;
-    bool bellbool = false;
 
     // Start is called before the first frame update
     void Start()
     {
         bell = new Bell();
         InitializeWorld();
-
-
     }
     /// <summary>
     /// FUNCION QUE INICIALIZA EL MUNDO Y TODOS SUS FANTASMAS
@@ -85,20 +82,21 @@ public class SchoolScript : MonoBehaviour
             yield return new WaitForSeconds(Random.Range(50f,70f));
             Debug.Log("A CLASE");
             //IF BELLSTATUS DICE QUE TOCA CLASE
-            bell.setValue(true);
             BoxCollider selectedClass = SelectRandomClass();
 
-            if (!bellbool)
+            if (!bell.getValue())
             {
                 bellEvent?.Invoke();
+                bell.setValue(true);
             }
             else
             {
                 bellEventEnd?.Invoke();
+                bell.setValue(false);
             }
-            
+
             //Foreach pj => lanzar una percepcion de que ha sonado la campana
-            //foreach(var ghost in studentList)
+            //foreach (var ghost in studentList)
             //{
             //    ghost.GetComponent<ghostBehaviour>().bellRinging = true;
             //}

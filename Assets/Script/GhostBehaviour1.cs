@@ -40,7 +40,7 @@ public class GhostBehaviour1 : MonoBehaviour
     private void Awake()
     {
         sc.bellEvent.AddListener(BellRings);
-        sc.bellEvent.AddListener(ClassEnds);
+        sc.bellEventEnd.AddListener(ClassEnds);
 
         agent = GetComponent<NavMeshAgent>();
 
@@ -80,8 +80,6 @@ public class GhostBehaviour1 : MonoBehaviour
     {
         fsm.Update();
 
-        print(fsm.GetCurrentState().Name);
-
         if(fsm.GetCurrentState().Name == "Wandering")
         {
             us.Update();
@@ -94,13 +92,14 @@ public class GhostBehaviour1 : MonoBehaviour
             {
                 agent.enabled = false;
                 transform.position = new Vector3(chairAux.transform.position.x, chairAux.transform.position.y + 0.7f, chairAux.transform.position.z);
+                transform.rotation = chairAux.transform.rotation;
                 fsm.Fire("GoClass_to_attendClass");
             }
         }
 
-        Random.InitState(System.Environment.TickCount);
+        Random.InitState(System.Environment.TickCount * (int)transform.position.x);
 
-        if (Random.Range(0, 10000) == 1)
+        if (Random.Range(0, 7000) == 1)
         {
             GoToEat();
         }

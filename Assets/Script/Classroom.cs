@@ -46,7 +46,7 @@ public class Classroom : MonoBehaviour
             if (!c.occupied) b = true;
         }
 
-        return true;
+        return b;
     }
 
 }
