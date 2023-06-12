@@ -21,6 +21,9 @@ public class Teacher : MonoBehaviour
 
         agent = GetComponent<NavMeshAgent>();
 
+        agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+
+
         Random.InitState(System.Environment.TickCount);
         agent.speed = Random.Range(2, 5);
         Random.InitState(System.Environment.TickCount);

@@ -18,6 +18,8 @@ public class GhostBehaviour1 : MonoBehaviour
     [SerializeField] public DiningRoomController dc;
     [SerializeField] private SchoolScript sc;
 
+    bool goingToEat=false;
+
     //Utility System variables
     public float timePee;
     public float needPee;
@@ -43,6 +45,8 @@ public class GhostBehaviour1 : MonoBehaviour
         sc.bellEventEnd.AddListener(ClassEnds);
 
         agent = GetComponent<NavMeshAgent>();
+
+        agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
 
         Random.InitState(System.Environment.TickCount);
         agent.speed = Random.Range(2, 5);
@@ -96,7 +100,17 @@ public class GhostBehaviour1 : MonoBehaviour
                 fsm.Fire("GoClass_to_attendClass");
             }
         }
-
+        else if (goingToEat)
+        {
+            if (HasReachedDestination())
+            {
+                if (dc.ghostsList.Count < 6)
+                {
+                    dc.ghostsList.Add(this);
+                    goingToEat = false;
+                }
+            }
+        }
         Random.InitState(System.Environment.TickCount * (int)transform.position.x);
 
         if (Random.Range(0, 7000) == 1)
@@ -208,8 +222,17 @@ public class GhostBehaviour1 : MonoBehaviour
 
     private void GoToEat()
     {
-        fsm.Fire("Wander_to_idle");
-        dc.ghostsList.Add(this);
+        if (dc.ghostsList.Count < 6)
+        {
+            fsm.Fire("Wander_to_idle");
+            GoToDiningRoom();
+        }
+    }
+
+    private void GoToDiningRoom()
+    {
+        agent.destination = dc.transform.position;
+        goingToEat = true;
     }
 
     public void EndOrder()
