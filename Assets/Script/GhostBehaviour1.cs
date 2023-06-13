@@ -20,6 +20,8 @@ public class GhostBehaviour1 : MonoBehaviour
     [SerializeField] public DiningRoomController dc;
     [SerializeField] private SchoolScript sc;
 
+    bool goingToEat = false;
+
     //Utility System variables
     private float eatIncreaseRate = 0.1f; // Tasa de incremento para la necesidad de comer
     private float peeIncreaseRate = 0.05f; // Tasa de incremento para la necesidad de hacer pipí
@@ -51,6 +53,7 @@ public class GhostBehaviour1 : MonoBehaviour
         sc.bellEventEnd.AddListener(ClassEnds);
 
         agent = GetComponent<NavMeshAgent>();
+        agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
 
         Random.InitState(System.Environment.TickCount);
         agent.speed = Random.Range(2, 5);
@@ -94,11 +97,13 @@ public class GhostBehaviour1 : MonoBehaviour
     private void Update()
     {
         fsm.Update();
+        IncreaseNeeds();
+        us.Update();
 
         if (fsm.GetCurrentState().Name == "Wandering")
         {
-            IncreaseNeeds();
-            us.Update();
+            //IncreaseNeeds();
+            //us.Update();
             Wandering();
         }
 
@@ -112,10 +117,20 @@ public class GhostBehaviour1 : MonoBehaviour
                 fsm.Fire("GoClass_to_attendClass");
             }
         }
+        else if (goingToEat)
+        {
+            if (HasReachedDestination())
+            {
+                if (dc.ghostsList.Count < 6)
+                {
+                    dc.ghostsList.Add(this);
+                    goingToEat = false;
+                }
+            }
+        }
 
-        
 
-        
+
 
 
         //bestAction = us.GetBestAction();
@@ -241,8 +256,17 @@ public class GhostBehaviour1 : MonoBehaviour
 
     private void GoToEat()
     {
-        fsm.Fire("Wander_to_idle");
-        dc.ghostsList.Add(this);
+        if (dc.ghostsList.Count < 6)
+        {
+            fsm.Fire("Wander_to_idle");
+            GoToDiningRoom();
+        }
+    }
+
+    private void GoToDiningRoom()
+    {
+        agent.destination = dc.transform.position;
+        goingToEat = true;
     }
 
     public void EndOrder()
@@ -304,17 +328,22 @@ public class GhostBehaviour1 : MonoBehaviour
         needGhosting = minNeed;
 
 
+
         Factor factorPee = new LeafVariable(() => needPee, maxNeed, minNeed);//linear
         Factor factorEat = new LeafVariable(() => needEat, maxNeed, minNeed);
         Factor factorGhosting = new LeafVariable(() => needGhosting, maxNeed, minNeed);
+        Factor factorWander = new LeafVariable(() => needGhosting, maxNeed, minNeed);
 
         Factor curvePee = new LinearCurve(factorPee, 0.01f);
         Factor curveGhosting = new Sigmoide(factorGhosting, a, b);
         Factor curveEating = new Threshold(factorEat, thresholdEat);
 
+        Factor curveWander = new LinearCurve(factorWander, 0, 20);
+
         us.CreateUtilityAction("Pee", UrinatingAction, curvePee);
         us.CreateUtilityAction("Eat", OrderingFoodAction, curveEating);
         us.CreateUtilityAction("Ghosting", GhostingAction, curveGhosting);
+        us.CreateUtilityAction("Wander", Wandering, curveWander);
     }
 
 
