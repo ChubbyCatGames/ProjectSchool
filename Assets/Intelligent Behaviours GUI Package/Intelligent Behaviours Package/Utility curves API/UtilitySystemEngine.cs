@@ -65,8 +65,10 @@ public class UtilitySystemEngine : BehaviourEngine
 
     public void Update()
     {
-        if(actions.Count != 0)
+   
+        if (actions.Count != 0)
         {
+         
             if (ActiveAction != null)
             {
                 if (!Active && !ActiveAction.HasSubmachine) return;
@@ -83,12 +85,15 @@ public class UtilitySystemEngine : BehaviourEngine
 
                 if (maxIndex != activeActionIndex)
                 {
+                    
                     ExitTransition(this.actions[maxIndex]);
+                   
                 }
                 ActiveAction.Update(); 
             } else if(Active && ActiveAction == null) {
                 int maxIndex = getMaxUtilityIndex();
                 ExitTransition(this.actions[maxIndex]);
+               
                 ActiveAction.Update(); 
             }
         }
