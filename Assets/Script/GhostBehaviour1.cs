@@ -23,8 +23,8 @@ public class GhostBehaviour1 : MonoBehaviour
     bool goingToEat = false;
 
     //Utility System variables
-    private float eatIncreaseRate = 0.1f; // Tasa de incremento para la necesidad de comer
-    private float peeIncreaseRate = 0.05f; // Tasa de incremento para la necesidad de hacer pipí
+    private int eatIncreaseRate = 0; // Tasa de incremento para la necesidad de comer
+    private float peeIncreaseRate = 0.2f; // Tasa de incremento para la necesidad de hacer pipí
     private float ghostingIncreaseRate = 0.2f; // Tasa de incremento para la necesidad de asustar
 
     public float timePee;
@@ -35,6 +35,7 @@ public class GhostBehaviour1 : MonoBehaviour
     public float thresholdEat = 75;
 
     public bool activeNeed;
+    public bool auxNeed;
 
     //scaring for alumni, teachers room for teachers
     public float timeGhosting;
@@ -96,15 +97,20 @@ public class GhostBehaviour1 : MonoBehaviour
 
     private void Update()
     {
+ 
         fsm.Update();
-        IncreaseNeeds();
-        us.Update();
+        
 
         if (fsm.GetCurrentState().Name == "Wandering")
         {
-            //IncreaseNeeds();
-            //us.Update();
             Wandering();
+            if (activeNeed == false)
+            {
+                IncreaseNeeds();
+            }
+            us.Update();
+
+            
         }
 
         if (fsm.GetCurrentState().Name == "GoingClass")
@@ -146,7 +152,7 @@ public class GhostBehaviour1 : MonoBehaviour
 
         if (Random.Range(0, 7000) == 1)
         {
-            GoToEat();
+           // GoToEat();
         }
 
         if (Input.GetKeyDown(KeyCode.X))//This is to force all the students to eat
@@ -324,7 +330,7 @@ public class GhostBehaviour1 : MonoBehaviour
         activeNeed = false;
 
         needEat = minNeed;
-        needPee = minNeed;
+        needPee = 0;
         needGhosting = minNeed;
 
 
@@ -334,7 +340,7 @@ public class GhostBehaviour1 : MonoBehaviour
         Factor factorGhosting = new LeafVariable(() => needGhosting, maxNeed, minNeed);
         Factor factorWander = new LeafVariable(() => needGhosting, maxNeed, minNeed);
 
-        Factor curvePee = new LinearCurve(factorPee, 0.01f);
+        Factor curvePee = new LinearCurve(factorPee, 1, 0);
         Factor curveGhosting = new Sigmoide(factorGhosting, a, b);
         Factor curveEating = new Threshold(factorEat, thresholdEat);
 
@@ -357,48 +363,48 @@ public class GhostBehaviour1 : MonoBehaviour
         {
             needEat += eatIncreaseRate;
         }
-        
+        if (needEat == thresholdEat){
+            activeNeed = true;
+        }
+
 
         // Incremento de la necesidad de hacer pipí (lineal)
-
-        needPee += peeIncreaseRate;
+        if (!activeNeed)
+        {
+            needPee += peeIncreaseRate;
+        }
+        if (needPee >= maxNeed)
+        {
+            activeNeed = true;
+            Debug.Log("activenedd trusita");
+        }
 
 
         // Incremento de la necesidad de asustar (sigmoide)
 
-        float ghostingSigmoid = 1 / (1 + Mathf.Exp(-a * (needGhosting - b)));
-        needGhosting += ghostingIncreaseRate * ghostingSigmoid;
+        //float ghostingSigmoid = 1 / (1 + Mathf.Exp(-a * (needGhosting - b)));
+        //needGhosting += ghostingIncreaseRate * ghostingSigmoid;
 
     }
 
-    private void ResetEatNeed()
-    {
-        needEat = 0;
-    }
-
-    private void ResetPeeNeed()
-    {
-        needPee = 0;
-    }
-
-    private void ResetGhostingNeed()
-    {
-        needGhosting = 0;
-    }
+ 
 
 
 
-    void GenerateMovement()
-    {
-        // Set a new random destination within the bounds of the NavMesh
-        agent.SetDestination(Random.insideUnitSphere * agent.areaMask);
-    }
+    
 
 
     void UrinatingAction()
     {
-        ResetPeeNeed();
+        
         print("Pipi");
+        needPee = 0;
+        activeNeed = false;
+        Debug.Log("falsita acitva nedd");
+        us.Reset();
+        Debug.Log("Resetao el us");
+        
+        
         
     }
 
@@ -406,19 +412,16 @@ public class GhostBehaviour1 : MonoBehaviour
     {
         GoToEat();
         print("food");
-        ResetEatNeed();
+        us.Reset();
+        activeNeed = false;
     }
 
-    void EatingAction()
-    {
-        print("eat");
-
-    }
+   
 
     void GhostingAction()
     {
         print("ghost");
-        ResetGhostingNeed();
+       
     }
 
 }
