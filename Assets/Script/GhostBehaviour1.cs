@@ -24,7 +24,7 @@ public class GhostBehaviour1 : MonoBehaviour
 
     //Utility System variables
     private int eatIncreaseRate = 0; // Tasa de incremento para la necesidad de comer
-    private float peeIncreaseRate = 0.2f; // Tasa de incremento para la necesidad de hacer pipí
+    private float peeIncreaseRate = Random.Range(0.02f, 0.1f); // Tasa de incremento para la necesidad de hacer pipí
     private float ghostingIncreaseRate = 0.2f; // Tasa de incremento para la necesidad de asustar
 
     public float timePee;
