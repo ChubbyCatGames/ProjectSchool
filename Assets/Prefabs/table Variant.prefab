@@ -183,6 +183,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 23365031445324726, guid: 91dc1ab115d03f04b930f9e619fb953f, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 23365031445324726, guid: 91dc1ab115d03f04b930f9e619fb953f, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 30b92673b9b7ef44c9c11a474d9910c9, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 91dc1ab115d03f04b930f9e619fb953f, type: 3}
 --- !u!1 &3154131975364720814 stripped
@@ -207,8 +215,6 @@ MonoBehaviour:
   - {fileID: 1536955534}
   - {fileID: 1321985042}
   - {fileID: 1844611118}
-  trayPos: {fileID: 0}
-  trayPrefab: {fileID: 0}
   tray: {fileID: 1154303854539013845}
 --- !u!4 &3157045597437168634 stripped
 Transform:
