@@ -13,9 +13,11 @@ public class GhostBehaviour1 : MonoBehaviour
     public NavMeshAgent agent;
 
     private ClassroomChair chairAux = null;
+    private ThroneWC throneAux = null;
 
     [SerializeField] private List<Transform> targets;
     [SerializeField] private List<Classroom> classList;
+    [SerializeField] private List<Bathroom> bathList;
 
     [SerializeField] public DiningRoomController dc;
     [SerializeField] private SchoolScript sc;
@@ -24,7 +26,7 @@ public class GhostBehaviour1 : MonoBehaviour
 
     //Utility System variables
     private int eatIncreaseRate = 0; // Tasa de incremento para la necesidad de comer
-    private float peeIncreaseRate = Random.Range(0.02f, 0.1f); // Tasa de incremento para la necesidad de hacer pipí
+    private float peeIncreaseRate; // Tasa de incremento para la necesidad de hacer pipí
     private float ghostingIncreaseRate = 0.2f; // Tasa de incremento para la necesidad de asustar
 
     public float timePee;
@@ -50,17 +52,30 @@ public class GhostBehaviour1 : MonoBehaviour
 
     private void Awake()
     {
+        int seed;
+        string str = gameObject.name;
+        string str2 = string.Empty;
+
+        for (int i = 0; i < str.Length; i++)
+        {
+            if (char.IsDigit(str[i]))
+            {
+                str2 += str[i];
+            }
+        }
+        seed =int.Parse(str2);
         sc.bellEvent.AddListener(BellRings);
         sc.bellEventEnd.AddListener(ClassEnds);
 
         agent = GetComponent<NavMeshAgent>();
         agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
 
-        Random.InitState(System.Environment.TickCount);
+        Random.InitState(seed);
         agent.speed = Random.Range(2, 5);
-        Random.InitState(System.Environment.TickCount);
+        Random.InitState(seed*2);
         agent.acceleration = Random.Range(7, 12);
-
+        maxNeed = Random.Range(75, 1000);
+        peeIncreaseRate = Random.Range(0.02f, 0.1f);
         //Machine
         fsm = new StateMachineEngine(false);
 
@@ -216,6 +231,27 @@ public class GhostBehaviour1 : MonoBehaviour
         chairAux = chair;
     }
 
+    private void GoingBath()
+    {
+        Bathroom b = SelectRandomBath();
+        ThroneWC throne;
+
+        do
+        {
+            Random.InitState(System.Environment.TickCount);
+            while (!b.CheckIfRoom())
+            {
+                b = SelectRandomBath();
+            }
+
+            throne = b.OccupeThrone();
+
+        }while (b== null);
+
+        agent.destination = throne.transform.position;
+        throneAux = throne;
+    }
+
     private void AttendingClass()
     {
 
@@ -302,6 +338,13 @@ public class GhostBehaviour1 : MonoBehaviour
         Random.InitState(System.Environment.TickCount);
         int randomClass = Random.Range(0, classList.Count);
         return classList[randomClass];
+    }
+
+    private Bathroom SelectRandomBath()
+    {
+        Random.InitState(System.Environment.TickCount);
+        int randomBath = Random.RandomRange(0,bathList.Count);
+        return bathList[randomBath];
     }
 
     //Coroutines
@@ -398,6 +441,7 @@ public class GhostBehaviour1 : MonoBehaviour
     {
         
         print("Pipi");
+        GoingBath();
         needPee = 0;
         activeNeed = false;
         Debug.Log("falsita acitva nedd");
