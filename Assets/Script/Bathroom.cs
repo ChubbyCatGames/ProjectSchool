@@ -32,7 +32,10 @@ public class Bathroom : MonoBehaviour
     public ThroneWC OccupeThrone()
     {
         ThroneWC throne = SelectThrone();
-        throne.occupied = true;
+        if (throne != null)
+        {
+            throne.occupied = true;
+        }
 
         return throne;
     }

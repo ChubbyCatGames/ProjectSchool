@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -25,12 +26,13 @@ public class GhostBehaviour1 : MonoBehaviour
     bool goingToEat = false;
 
     //Utility System variables
-    private int eatIncreaseRate = 0; // Tasa de incremento para la necesidad de comer
+    private float eatIncreaseRate; // Tasa de incremento para la necesidad de comer
     private float peeIncreaseRate; // Tasa de incremento para la necesidad de hacer pipí
     private float ghostingIncreaseRate = 0.2f; // Tasa de incremento para la necesidad de asustar
 
     public float timePee;
     public float needPee;
+    public bool reachedThrone;
 
     public float timeEat;
     public float needEat;
@@ -76,6 +78,7 @@ public class GhostBehaviour1 : MonoBehaviour
         agent.acceleration = Random.Range(7, 12);
         maxNeed = Random.Range(75, 1000);
         peeIncreaseRate = Random.Range(0.02f, 0.1f);
+        eatIncreaseRate = Random.Range(0.02f, 0.1f);
         //Machine
         fsm = new StateMachineEngine(false);
 
@@ -150,6 +153,18 @@ public class GhostBehaviour1 : MonoBehaviour
             }
         }
 
+        if(needPee>= maxNeed)
+        {
+            reachedThrone = HasReachedThrone();
+            Debug.Log("Pipi Update");
+            if(reachedThrone)
+            {
+                agent.enabled = false;
+                transform.position = new Vector3(throneAux.transform.position.x, throneAux.transform.position.y + 0.7f, throneAux.transform.position.z);
+                transform.rotation = throneAux.transform.rotation;
+
+            }
+        }
 
 
 
@@ -183,6 +198,7 @@ public class GhostBehaviour1 : MonoBehaviour
     }
     private void Wandering()
     {
+        if (!agent.isActiveAndEnabled) return;
         // Check if the character has reached its destination
         if (agent.remainingDistance < agent.stoppingDistance)
         {
@@ -239,14 +255,14 @@ public class GhostBehaviour1 : MonoBehaviour
         do
         {
             Random.InitState(System.Environment.TickCount);
-            while (!b.CheckIfRoom())
+            if (!b.CheckIfRoom())
             {
                 b = SelectRandomBath();
             }
 
             throne = b.OccupeThrone();
 
-        }while (b== null);
+        }while (throne== null);
 
         agent.destination = throne.transform.position;
         throneAux = throne;
@@ -274,6 +290,21 @@ public class GhostBehaviour1 : MonoBehaviour
         }
         return destinyReached;
     }
+
+    public bool HasReachedThrone()
+    {
+        bool destinyReached = false;
+
+
+        if (Vector3.Distance(transform.position, throneAux.transform.position) <= 1f)
+        {
+            destinyReached= true;
+        }
+                
+        
+        return destinyReached;
+    }
+
 
 
     //Methods
@@ -385,7 +416,7 @@ public class GhostBehaviour1 : MonoBehaviour
 
         Factor curvePee = new LinearCurve(factorPee, 1, 0);
         Factor curveGhosting = new Sigmoide(factorGhosting, a, b);
-        Factor curveEating = new Threshold(factorEat, thresholdEat);
+        Factor curveEating = new LinearCurve(factorEat, 1,0);
 
         Factor curveWander = new LinearCurve(factorWander, 0, 20);
 
@@ -402,11 +433,11 @@ public class GhostBehaviour1 : MonoBehaviour
     {
 
 
-        if (needEat < thresholdEat)
+        if (!activeNeed)
         {
             needEat += eatIncreaseRate;
         }
-        if (needEat == thresholdEat){
+        if (needEat >= maxNeed){
             activeNeed = true;
         }
 
@@ -442,16 +473,32 @@ public class GhostBehaviour1 : MonoBehaviour
         
         print("Pipi");
         GoingBath();
+        StartCoroutine(DoPee());
+        //needPee = 0;
+        //activeNeed = false;
+        //Debug.Log("falsita acitva nedd");
+        ////us.Reset();
+        //Debug.Log("Resetao el us");
+
+        
+    }
+    IEnumerator DoPee()
+    {
+
+
+        yield return new WaitUntil(() => reachedThrone);
+        Debug.Log("Pipi 2");
+        yield return new WaitForSeconds(1.5f);
+        agent.enabled = true;
+        reachedThrone = false;
         needPee = 0;
         activeNeed = false;
         Debug.Log("falsita acitva nedd");
         us.Reset();
         Debug.Log("Resetao el us");
-        
-        
-        
-    }
 
+        throneAux.occupied = false;
+    }
     void OrderingFoodAction()
     {
         GoToEat();
