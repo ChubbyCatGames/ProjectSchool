@@ -13,7 +13,7 @@ public class GhostBehaviour1 : MonoBehaviour
 
     public NavMeshAgent agent;
 
-    private ClassroomChair chairAux = null;
+    public ClassroomChair chairAux = null;
     private ThroneWC throneAux = null;
 
     [SerializeField] private List<Transform> targets;
@@ -36,7 +36,6 @@ public class GhostBehaviour1 : MonoBehaviour
 
     public float timeEat;
     public float needEat;
-    public float thresholdEat = 75;
 
     public bool activeNeed;
     public bool auxNeed;
@@ -50,7 +49,7 @@ public class GhostBehaviour1 : MonoBehaviour
 
 
     float minNeed = 0;
-    float maxNeed = 100;
+    [SerializeField]float maxNeed = 100;
 
     private void Awake()
     {
@@ -136,6 +135,7 @@ public class GhostBehaviour1 : MonoBehaviour
             if (HasReachedDestination())
             {
                 agent.enabled = false;
+                activeNeed = false;
                 transform.position = new Vector3(chairAux.transform.position.x, chairAux.transform.position.y + 0.7f, chairAux.transform.position.z);
                 transform.rotation = chairAux.transform.rotation;
                 fsm.Fire("GoClass_to_attendClass");
@@ -317,7 +317,11 @@ public class GhostBehaviour1 : MonoBehaviour
     private void ClassEnds()
     {
         agent.enabled = true;
-        chairAux.LeaveChair();
+        if(chairAux != null)
+        {
+            chairAux.LeaveChair();
+            chairAux = null;
+        }
 
         foreach (Classroom c in classList)
         {
