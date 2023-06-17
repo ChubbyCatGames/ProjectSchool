@@ -46,29 +46,35 @@ public class TestJanitor : MonoBehaviour
         State walk = fsm.CreateState("walk", WalkAction);
         State walkToPA = fsm.CreateState("walkToPA", WalkToPAAction);
         State walkToPB = fsm.CreateState("walkToPB", WalkToPBAction);
+        State cleanS = fsm.CreateState("cleanS", CleanAction);
         State flirt = fsm.CreateState("flirt", FlirtAction);
         State originAgain = fsm.CreateState("originAgain", OriginAgainAction);
-        State cleanS = fsm.CreateState("cleanS", CleanAction);
 
         //Perceptions
         arriveToDestination = fsm.CreatePerception<ArriveToDestination>(new ArriveToDestination());
         Perception started = fsm.CreatePerception<PushPerception>();
+        Perception stainClean = fsm.CreatePerception<PushPerception>();
+        Perception stainClose = fsm.CreatePerception<PushPerception>();
+        Perception cookArrives = fsm.CreatePerception<PushPerception>();
+        Perception cookLeaves = fsm.CreatePerception<PushPerception>();
+        Perception atDestination = fsm.CreatePerception<PushPerception>();
 
         //Transitions
         fsm.CreateTransition("started", idle, started, walk);
-        fsm.CreateTransition("second", walk, started, walkToPA);
+        fsm.CreateTransition("second", walk, atDestination, walkToPA);
 
-        fsm.CreateTransition("flirt", walkToPA, started, flirt);
-
+        //para flirtear
+        fsm.CreateTransition("flirt", walkToPA, cookArrives, flirt);
         //si flirtea
-        fsm.CreateTransition("third", flirt, started, walkToPB);
+        fsm.CreateTransition("third", flirt, cookLeaves, walkToPB);
         //si no flirtea
-        fsm.CreateTransition("thirdNoFlirt", walkToPA, started, walkToPB);
+        fsm.CreateTransition("thirdNoFlirt", walkToPA, atDestination, walkToPB);
 
-        fsm.CreateTransition("clean", walk, started,cleanS);
-        fsm.CreateTransition("continue", cleanS, started, walk);
+        //para limpiar
+        fsm.CreateTransition("clean", walk, stainClose, cleanS);
+        fsm.CreateTransition("continue", cleanS, stainClean, walk);
 
-        fsm.CreateTransition("originAgain", walkToPB, started, originAgain);
+        fsm.CreateTransition("originAgain", walkToPB, atDestination, originAgain);
         fsm.CreateTransition("restart", originAgain, started, idle);
 
     }
@@ -79,8 +85,6 @@ public class TestJanitor : MonoBehaviour
         fsm.Update();
         arriveToDestination.SetPosition(transform.position);
 
-
-        //Debug.Log(fsm.GetCurrentState().Name);
         if (posDest != null && fsm.GetCurrentState().Name =="idle")
         {
             fsm.Fire("started");
