@@ -28,7 +28,7 @@ public class GhostBehaviour1 : MonoBehaviour
     //Utility System variables
     private float eatIncreaseRate; // Tasa de incremento para la necesidad de comer
     private float peeIncreaseRate; // Tasa de incremento para la necesidad de hacer pipí
-    private float ghostingIncreaseRate = 0.2f; // Tasa de incremento para la necesidad de asustar
+    //private float ghostingIncreaseRate = 0.2f; // Tasa de incremento para la necesidad de asustar
 
     public float timePee;
     public float needPee;
@@ -45,8 +45,6 @@ public class GhostBehaviour1 : MonoBehaviour
     public float needGhosting;
     public float a = 20;
     public float b = 50;
-
-
 
     float minNeed = 0;
     [SerializeField]float maxNeed = 100;
