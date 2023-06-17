@@ -77,7 +77,7 @@ public class GhostBehaviour1 : MonoBehaviour
         agent.acceleration = Random.Range(7, 12);
         maxNeed = Random.Range(75, 1000);
         peeIncreaseRate = Random.Range(0.02f, 0.1f);
-        eatIncreaseRate = Random.Range(0.02f, 0.1f);
+        eatIncreaseRate = Random.Range(0.01f, 0.07f);
         //Machine
         fsm = new StateMachineEngine(false);
 
@@ -145,7 +145,7 @@ public class GhostBehaviour1 : MonoBehaviour
         {
             if (HasReachedDestination())
             {
-                if (dc.ghostsList.Count < 6)
+                if (dc.ghostsList.Count < 5)
                 {
                     dc.ghostsList.Add(this);
                     goingToEat = false;
@@ -179,17 +179,6 @@ public class GhostBehaviour1 : MonoBehaviour
 
 
         Random.InitState(System.Environment.TickCount * (int)transform.position.x);
-
-        if (Random.Range(0, 7000) == 1)
-        {
-           // GoToEat();
-        }
-
-        if (Input.GetKeyDown(KeyCode.X))//This is to force all the students to eat
-        {
-            GoToEat();
-        }
-
     }
 
 
@@ -243,8 +232,13 @@ public class GhostBehaviour1 : MonoBehaviour
 
         c.isHappeningClass = true;
 
-        agent.destination = chair.transform.position;
+        if (agent != null && agent.enabled)
+        {
+            agent.destination = chair.transform.position;
+        }
+
         chairAux = chair;
+        
     }
 
     private void GoingBath()
@@ -278,13 +272,16 @@ public class GhostBehaviour1 : MonoBehaviour
     {
         bool destinyReached = false;
 
-        if (!agent.pathPending)
+        if (agent != null && agent.enabled)
         {
-            if (agent.remainingDistance <= agent.stoppingDistance)
+            if (!agent.pathPending)
             {
-                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                if (agent.remainingDistance <= agent.stoppingDistance)
                 {
-                    destinyReached = true;
+                    if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                    {
+                        destinyReached = true;
+                    }
                 }
             }
         }
@@ -333,7 +330,7 @@ public class GhostBehaviour1 : MonoBehaviour
 
     private void GoToEat()
     {
-        if (dc.ghostsList.Count < 6)
+        if (dc.ghostsList.Count < 5)
         {
             fsm.Fire("Wander_to_idle");
             GoToDiningRoom();

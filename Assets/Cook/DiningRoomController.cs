@@ -76,8 +76,33 @@ public class DiningRoomController : MonoBehaviour
     {
         //Do things
         //Interact with the first studet in the list and ask for the command: AskCommand()
-
+        int random = Random.Range(0, 6);
         string command = "cheese";
+        switch (random)
+        {
+            case 0:
+                command = "watermelon";
+                break;
+            case 1:
+                command = "hotDog";
+                break;
+            case 2:
+                command = "cherry";
+                break;
+            case 3:
+                command = "burger";
+                break;
+            case 4:
+                command = "cheese";
+                break;
+            case 5:
+                command = "banana";
+                break;
+            default:
+                command = "watermelon";
+                break;
+        }
+
 
         //Now go for the command; always the tray first and then the food.
         StartCoroutine(AttendingStudentRoutine(GetFoodTransform(command)));
@@ -159,7 +184,7 @@ public class DiningRoomController : MonoBehaviour
     IEnumerator AttendingStudentRoutine(Transform foodTransform)
     {
         yield return new WaitUntil(() => ghostsList[0].HasReachedDestination());
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1f);
 
         cookReference.Move(traysShelf);
 
@@ -172,7 +197,7 @@ public class DiningRoomController : MonoBehaviour
         cookReference.Move(cookReference.studentTransform);
 
         yield return new WaitUntil(() => cookReference.HasReachedDestination());
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
 
         ghostsList[0].EndOrder();
 

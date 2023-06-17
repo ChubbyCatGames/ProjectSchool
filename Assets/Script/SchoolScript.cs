@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 public class SchoolScript : MonoBehaviour
 {
-    [SerializeField] int numStudent = 30;
+    [SerializeField] int numStudent = 45;
     [SerializeField] int numTeacher= 10;
     public Bell bell;
 
@@ -79,7 +79,7 @@ public class SchoolScript : MonoBehaviour
     IEnumerator CountdownBell()
     {
         while(true) {
-            yield return new WaitForSeconds(Random.Range(50f,70f));
+            yield return new WaitForSeconds(Random.Range(70f,90f));
             Debug.Log("A CLASE");
             //IF BELLSTATUS DICE QUE TOCA CLASE
             BoxCollider selectedClass = SelectRandomClass();

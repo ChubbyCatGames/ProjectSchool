@@ -102,15 +102,6 @@ public class TestJanitor : MonoBehaviour
                     fsm.Fire("flirt");
                 }
             }
-
-            if (fsm.GetCurrentState().Name == "flirt" && Vector3.Distance(transform.position, targets[1].transform.position) < 2.0f)
-            {
-
-                if (endFlirt == true)
-                {
-                    fsm.Fire("third");
-                }
-            }
         }
         else
         {
@@ -119,9 +110,19 @@ public class TestJanitor : MonoBehaviour
                     fsm.Fire("thirdNoFlirt");
             }
         }
-        
 
-        if(fsm.GetCurrentState().Name == "walkToPB" && Vector3.Distance(transform.position, targets[2].transform.position) < 2.0f)
+
+        if (fsm.GetCurrentState().Name == "flirt" && Vector3.Distance(transform.position, targets[1].transform.position) < 2.0f)
+        {
+
+            if (endFlirt == true)
+            {
+                fsm.Fire("third");
+            }
+        }
+
+
+        if (fsm.GetCurrentState().Name == "walkToPB" && Vector3.Distance(transform.position, targets[2].transform.position) < 2.0f)
         {
             fsm.Fire("originAgain");
         }
@@ -195,7 +196,7 @@ public class TestJanitor : MonoBehaviour
 
     bool CookNear()
     {
-        if (Vector3.Distance(transform.position, cook.transform.position) <= 1f)
+        if (Vector3.Distance(transform.position, cook.transform.position) <= 5f)
         {
             return true;
         }
@@ -205,7 +206,7 @@ public class TestJanitor : MonoBehaviour
     IEnumerator Flirt()
     {
         yield return new WaitForSeconds(1.0f);
-        yield return new WaitUntil(() => cook.HasReachedDestination());
+        yield return new WaitUntil(() => (cook.HasReachedDestination() && cook.flagJanitor && CookNear()));
         scJan.ShowNewSign(1);   
         yield return new WaitForSeconds(4.0f);
         cook.EndJanitor();

@@ -33,6 +33,7 @@ public class CookBehaviour : MonoBehaviour
 
     //Janitor
     [SerializeField] TestJanitor janitor;
+    public bool flagJanitor;
 
     void Awake()
     {
@@ -129,14 +130,19 @@ public class CookBehaviour : MonoBehaviour
             }
         }
 
-        if (CheckIfTray())
-        {
-            main_fsm.Fire("Wandering_to_tray");
-        }
-
         if (CheckIfStudent())
         {
             main_fsm.Fire("Wandering_to_student");
+        }
+
+        if (janitor.flagForCook)
+        {
+            JanitorCalls();
+        }
+
+        if (CheckIfTray())
+        {
+            main_fsm.Fire("Wandering_to_tray");
         }
 
         if(main_fsm.GetCurrentState().Name == "Janitor")
@@ -168,11 +174,6 @@ public class CookBehaviour : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.V))
         {
             EndJanitor();
-        }
-
-        if (janitor.flagForCook)
-        {
-            JanitorCalls();
         }
     }
 
@@ -241,6 +242,7 @@ public class CookBehaviour : MonoBehaviour
         StopCoroutine(StartTimer());
 
         main_fsm.Fire("Wandering_to_janitor");
+        flagJanitor = true;
     }
 
     private bool CheckIfTray()
@@ -262,6 +264,8 @@ public class CookBehaviour : MonoBehaviour
     public void EndJanitor()
     {
         main_fsm.Fire("Janitor_to_wandering");
+
+        flagJanitor = false;
 
         sc.RemoveSign();
 
