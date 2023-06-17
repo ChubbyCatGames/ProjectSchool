@@ -156,7 +156,6 @@ public class GhostBehaviour1 : MonoBehaviour
         if(needPee>= maxNeed)
         {
             reachedThrone = HasReachedThrone();
-            Debug.Log("Pipi Update");
             if(reachedThrone)
             {
                 agent.enabled = false;
@@ -165,9 +164,6 @@ public class GhostBehaviour1 : MonoBehaviour
 
             }
         }
-
-
-
 
         //bestAction = us.GetBestAction();
 
@@ -359,7 +355,6 @@ public class GhostBehaviour1 : MonoBehaviour
     {
         Random.InitState(System.Environment.TickCount);
         int random = Random.Range(0, targets.Count);
-        Debug.Log(random);
         Vector3 position = targets[random].position;
 
         return position;
@@ -423,7 +418,7 @@ public class GhostBehaviour1 : MonoBehaviour
 
         us.CreateUtilityAction("Pee", UrinatingAction, curvePee);
         us.CreateUtilityAction("Eat", OrderingFoodAction, curveEating);
-        us.CreateUtilityAction("Ghosting", GhostingAction, curveGhosting);
+        //us.CreateUtilityAction("Ghosting", GhostingAction, curveGhosting);
         us.CreateUtilityAction("Wander", Wandering, curveWander);
     }
 
@@ -451,7 +446,6 @@ public class GhostBehaviour1 : MonoBehaviour
         if (needPee >= maxNeed)
         {
             activeNeed = true;
-            Debug.Log("activenedd trusita");
         }
 
 
@@ -471,8 +465,6 @@ public class GhostBehaviour1 : MonoBehaviour
 
     void UrinatingAction()
     {
-        
-        print("Pipi");
         GoingBath();
         StartCoroutine(DoPee());
         //needPee = 0;
@@ -488,34 +480,21 @@ public class GhostBehaviour1 : MonoBehaviour
 
 
         yield return new WaitUntil(() => reachedThrone);
-        Debug.Log("Pipi 2");
         yield return new WaitForSeconds(1.5f);
         agent.enabled = true;
         reachedThrone = false;
         needPee = 0;
         activeNeed = false;
-        Debug.Log("falsita acitva nedd");
         us.Reset();
-        Debug.Log("Resetao el us");
 
         throneAux.occupied = false;
     }
     void OrderingFoodAction()
     {
         GoToEat();
-        print("food");
         us.Reset();
         activeNeed = false;
     }
-
-   
-
-    void GhostingAction()
-    {
-        print("ghost");
-       
-    }
-
 }
 
 public class Sigmoide : Curve

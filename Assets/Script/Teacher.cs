@@ -142,7 +142,6 @@ public class Teacher : MonoBehaviour
     {
         Random.InitState(System.Environment.TickCount);
         int random = Random.Range(0, targets.Count);
-        Debug.Log(random);
         Vector3 position = targets[random].position;
 
         return position;

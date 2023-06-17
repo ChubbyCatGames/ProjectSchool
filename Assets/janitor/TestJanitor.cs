@@ -217,8 +217,6 @@ public class TestJanitor : MonoBehaviour
 
     IEnumerator Clean()
     {
-        Debug.Log("LIMPIANDO");
-
         scJan.ShowNewSign(0);
         meshAgent.speed = 0;
         yield return new WaitForSeconds(3.0f);

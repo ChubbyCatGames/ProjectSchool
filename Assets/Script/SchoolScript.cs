@@ -47,25 +47,7 @@ public class SchoolScript : MonoBehaviour
     /// <exception cref="System.NotImplementedException"></exception>
     private void InitializeWorld()
     {
-        /*for (int i = 0; i < numStudent; i++)
-        {
-
-            studentList.AddRange(GameObject.FindGameObjectsWithTag("Student"));
-            studentList[i].transform.position = initialPosStudent.position;
-        }
-        for (int i = 0; i < numTeacher; i++)
-        {
-            teacherList.Add(Instantiate<GameObject>(prefabTeacher));
-            teacherList[i].transform.position = initialPosTeacher.position;
-        }
-        janitor= Instantiate(prefabJanitor);
-        janitor.transform.position= initialPosJanitor.position;
-        cook = Instantiate(prefabCook);
-        cook.transform.position= initialPosCook.position;
-        */
         StartCoroutine(CountdownBell());
-        
-
     }
 
 
@@ -80,8 +62,6 @@ public class SchoolScript : MonoBehaviour
     {
         while(true) {
             yield return new WaitForSeconds(Random.Range(70f,90f));
-            Debug.Log("A CLASE");
-            //IF BELLSTATUS DICE QUE TOCA CLASE
             BoxCollider selectedClass = SelectRandomClass();
 
             if (!bell.getValue())
@@ -95,14 +75,6 @@ public class SchoolScript : MonoBehaviour
                 bell.setValue(false);
             }
 
-            //Foreach pj => lanzar una percepcion de que ha sonado la campana
-            //foreach (var ghost in studentList)
-            //{
-            //    ghost.GetComponent<ghostBehaviour>().bellRinging = true;
-            //}
-
-            //IF BELLSTATUS DICE QUE NO TOCA CLASE
-            //A WANDEREAR JEFES
         }
 
     }

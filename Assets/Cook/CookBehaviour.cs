@@ -99,7 +99,6 @@ public class CookBehaviour : MonoBehaviour
 
     void Update()
     {
-        print(main_fsm.GetCurrentState().Name);
         wandering_fsm.Update();
         main_fsm.Update();
 
@@ -165,16 +164,6 @@ public class CookBehaviour : MonoBehaviour
             }
         }
 
-        //test
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            JanitorCalls();
-        }
-
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            EndJanitor();
-        }
     }
 
 
